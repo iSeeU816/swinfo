@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a6
+;; Version: 0.0.1a7
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a6"
+(defconst swver-version "0.0.1a7"
   "The version of Swver.")
 
 (defconst swver-emacs-src-repo-dir
@@ -251,50 +251,50 @@
   ;;     (message "swver: 2. The length of %s is %d." info (length info))
   ;;     (swver-insert info)))
 
-  ;; 2021-06-07 10:53:58 +0300; v0.0.1a6
-  (interactive
-   (completing-read-multiple "Software name: " swver-repo-dir)
-   ;; (list (completing-read-multiple "Software name: " swver-repo-dir))
-   )
-  (message "swver: 0. The length of %s is %d" name (length name))
-  (message "swver: 0. Type of %s is %s" name (type-of name))
-  (let ((item-count (length name))
-        (info
-         (if (> (length name) 1)
-             (progn
-               ;; (cl-loop for repo in name
-               ;;          do (message "swver: I'm in the loop!")
-               ;;          do (message "swver: 1a. Type of %s is %s" repo (type-of repo))
-               ;;          do (if (stringp repo) (message "swver: String? Yes2.") (message "swver: String? No2."))
-               ;;          do (message "swver: From inside the loop; %s" repo)
-               ;;          do (swver-repo-info repo)
-               ;;          do (message "swver: The format %s" repo))
+  ;; ;; 2021-06-07 10:53:58 +0300; v0.0.1a6
+  ;; (interactive
+  ;;  (completing-read-multiple "Software name: " swver-repo-dir)
+  ;;  ;; (list (completing-read-multiple "Software name: " swver-repo-dir))
+  ;;  )
+  ;; (message "swver: 0. The length of %s is %d" name (length name))
+  ;; (message "swver: 0. Type of %s is %s" name (type-of name))
+  ;; (let ((item-count (length name))
+  ;;       (info
+  ;;        (if (> (length name) 1)
+  ;;            (progn
+  ;;              ;; (cl-loop for repo in name
+  ;;              ;;          do (message "swver: I'm in the loop!")
+  ;;              ;;          do (message "swver: 1a. Type of %s is %s" repo (type-of repo))
+  ;;              ;;          do (if (stringp repo) (message "swver: String? Yes2.") (message "swver: String? No2."))
+  ;;              ;;          do (message "swver: From inside the loop; %s" repo)
+  ;;              ;;          do (swver-repo-info repo)
+  ;;              ;;          do (message "swver: The format %s" repo))
 
-               (setq-local swver-test-0 '())
-               (dolist (repo name)
-                 ;; (setq-local swver-test-0 (+ 1 swver-test-0))
-                 (message "swver: 1a. dolist count is %s" swver-test-0)
-                 ;; (format "%s" (swver-repo-info repo))
-                 (add-to-list 'swver-test-0
-                              (format "%s" (swver-repo-info repo)) 'append)
-                 )
-               (setq info swver-test-0))
+  ;;              (setq-local swver-test-0 '())
+  ;;              (dolist (repo name)
+  ;;                ;; (setq-local swver-test-0 (+ 1 swver-test-0))
+  ;;                (message "swver: 1a. dolist count is %s" swver-test-0)
+  ;;                ;; (format "%s" (swver-repo-info repo))
+  ;;                (add-to-list 'swver-test-0
+  ;;                             (format "%s" (swver-repo-info repo)) 'append)
+  ;;                )
+  ;;              (setq info swver-test-0))
 
-           (message "swver: I'm out of the loop! %s" name)
-           (message "swver: 1b. Type of %s is %s" name (type-of name))
-           (swver-repo-info (car name)))))
-    (message "swver: Item count is %s" item-count)
-    (message "swver: 2. The length of %s--%s is %d." name info (length info))
-    (message "swver: 2. Type of %s is %s" info (type-of info))
-    (if current-prefix-arg
-        ;; (message "swver: First %s" info)
-        (progn (kill-new info)
-               (message "swver: Just killed %S" info))
-      ;; (message "swver: Second %s" info)
-      (message "swver: 3. The length of %s is %d." info (length info))
-      (swver-insert item-count info)
-      ;; (insert info)
-      ))
+  ;;          (message "swver: I'm out of the loop! %s" name)
+  ;;          (message "swver: 1b. Type of %s is %s" name (type-of name))
+  ;;          (swver-repo-info (car name)))))
+  ;;   (message "swver: Item count is %s" item-count)
+  ;;   (message "swver: 2. The length of %s--%s is %d." name info (length info))
+  ;;   (message "swver: 2. Type of %s is %s" info (type-of info))
+  ;;   (if current-prefix-arg
+  ;;       ;; (message "swver: First %s" info)
+  ;;       (progn (kill-new info)
+  ;;              (message "swver: Just killed %S" info))
+  ;;     ;; (message "swver: Second %s" info)
+  ;;     (message "swver: 3. The length of %s is %d." info (length info))
+  ;;     (swver-insert item-count info)
+  ;;     ;; (insert info)
+  ;;     ))
 
   ;; 2021-06-07 13:17:00 +0300; still v0.0.1a6
   ;; (interactive
@@ -302,6 +302,75 @@
 
   ;; (do)
 
+  ;; ;; 2021-06-09 13:12:12 +0300; v0.0.1a7
+
+  ;; (interactive
+  ;;  (completing-read-multiple "Software name: " swver-repo-dir))
+
+  ;; (message "swver: `%s' type is %s" name (type-of name))
+  ;; (message "swver: Count %s" (length name))
+
+  ;; (let* ((info '())
+  ;;        ;; (info (format ""))
+  ;;        (collect (if (> (length name) 1)
+  ;;                     (dolist (repo name)
+  ;;                       (message "swver: dolist `%s'; its type is %s" repo (type-of repo))
+  ;;                       (message "swver: dolist data `%s'" (swver-repo-info repo))
+  ;;                       (message "swver: dolist (swver-repo-info repo) type is %s"
+  ;;                                (type-of (swver-repo-info repo)))
+  ;;                       (push (swver-repo-info repo) info)
+  ;;                       ;; (concat (swver-repo-info repo) info)
+  ;;                       )
+  ;;                   (push (swver-repo-info (car name)) info)))
+  ;;        (info-count (length info))
+  ;;        ;; (info-placeholder (format "TEST"))
+  ;;        ;; (info-ready (dolist (text info)
+  ;;        ;;               ;; (format "%s" text)
+  ;;        ;;               ;; (concat info-placeholder text)
+  ;;        ;;               (unless (equal (list text) (last info))
+  ;;        ;;                 ;; (format "\n")
+  ;;        ;;                 ;; (concat info-placeholder "\n")
+  ;;        ;;                 )))
+  ;;        )
+  ;;   (message "swver: `%s' type %s" info (type-of info))
+  ;;   (message "swver: Data %s" info)
+  ;;   (message "swver: Count %s" info-count)
+  ;;   ;; (swver-insert info-count (or info collect))
+  ;;   ;; (dolist (text info)
+  ;;   ;;   ;; (insert text "\n")
+
+  ;;   ;;   (insert text)
+  ;;   ;;   (message "swver: (Out) Last %s" (last info))
+  ;;   ;;   (unless (equal (list text) (last info))
+  ;;   ;;     (message "swver: (In) Text %s--Last %s" (list text) (last info))
+  ;;   ;;     (insert "\n"))
+  ;;   ;;   )
+
+  ;;   ;; (insert info-ready)
+  ;;   )
+
+  ;; 2021-06-10 11:35:20 +0300; v0.0.1a7
+
+  (interactive
+   (completing-read-multiple "Software name: " swver-repo-dir))
+
+  (let* (info
+         (collect (if (> (length name) 1)
+                      (dolist (repo name)
+                        (setq info (concat (swver-repo-info repo)
+                                           (unless (not (equal (list repo) (last name)))
+                                             "\n")
+                                           info))
+                        ;; (push (swver-repo-info repo) info)
+                        )
+                    ;; (push (swver-repo-info (car name) info))
+                    (setq info (swver-repo-info (car name)))
+                    )))
+    ;; (message "swver: `%s' type is %s" info (type-of info))
+    (if current-prefix-arg
+        (progn (kill-new info)
+               (message "swver: Info yanked to the kill ring."))
+      (insert info)))
   )
 
 (provide 'swver)
