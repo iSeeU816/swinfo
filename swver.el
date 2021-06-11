@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a7
+;; Version: 0.0.1a8
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a7"
+(defconst swver-version "0.0.1a8"
   "The version of Swver.")
 
 (defconst swver-emacs-src-repo-dir
@@ -109,9 +109,13 @@
   (let ((commit-hash (swver-repo-commit-hash repo-name))
         (commit-date (swver-repo-commit-date repo-name)))
     (cond
-     ((equal repo-name "emacs-src")
+     (
+      (equal repo-name "emacs-src")
+      ;; (equal repo-name 'emacs-src)
       (format "Emacs %s =%s= (%s)" emacs-version commit-hash commit-date))
-     ((equal repo-name "emacs-config")
+     (
+      (equal repo-name "emacs-config")
+      ;; (equal repo-name 'emacs-config)
       (format "Emacs config =%s= (%s)" commit-hash commit-date))
      (t (message "swver: %s is something else." repo-name)))))
 
@@ -123,7 +127,31 @@
         (insert text "\n"))
     (insert info)))
 
+(defun swver--info (name)
+  "WIP; 2021-06-10 13:03:34 +0300."
+  (message "swver: `%s' type is %s" name (type-of name))
+  (setq swver-multiple-line nil)
+  (let* (info
+         (collect (if (> (length name) 1)
+                      (dolist (repo name)
+                        (setq swver-multiple-line t)
+                        (setq info (concat (swver-repo-info repo)
+                                           (unless (not (equal (list repo) (last name)))
+                                             "\n")
+                                           info)))
+                    (setq info (swver-repo-info (car name)))))
+         ;; (collect-2 (dolist (repo name)
+         ;;              (setq info (concat (swver-repo-info repo)
+         ;;                                 (unless (not (equal (list repo) (last name)))
+         ;;                                   "\n")
+         ;;                                 info))))
+         )
+    (setq swver-info info)
+    (message "swver: `%s' type is %s" swver-info (type-of swver-info))))
+
 (defun swver (&rest name)
+  ;; (defun swver (&rest name &optional arg)
+  ;; (defun swver (name &optional arg)
   "WIP; 2021-06-04 13:29:10 +0300."
   ;; (let ((name (intern (completing-read "Software name: " swver-repo-dir))))
   ;;   (if (stringp name) (message "yes") (message "no"))
@@ -349,30 +377,61 @@
   ;;   ;; (insert info-ready)
   ;;   )
 
-  ;; 2021-06-10 11:35:20 +0300; v0.0.1a7
+  ;; ;; 2021-06-10 11:35:20 +0300; v0.0.1a7
+
+  ;; (interactive
+  ;;  (completing-read-multiple "Software name: " swver-repo-dir))
+
+  ;; (let* (info
+  ;;        (collect (if (> (length name) 1)
+  ;;                     (dolist (repo name)
+  ;;                       (setq info (concat (swver-repo-info repo)
+  ;;                                          (unless (not (equal (list repo) (last name)))
+  ;;                                            "\n")
+  ;;                                          info))
+  ;;                       ;; (push (swver-repo-info repo) info)
+  ;;                       )
+  ;;                   ;; (push (swver-repo-info (car name) info))
+  ;;                   (setq info (swver-repo-info (car name)))
+  ;;                   )))
+  ;;   ;; (message "swver: `%s' type is %s" info (type-of info))
+  ;;   (if current-prefix-arg
+  ;;       (progn (kill-new info)
+  ;;              (message "swver: Info yanked to the kill ring."))
+  ;;     (insert info)))
+
+  ;; 2021-06-10 13:06:20 +0300; v0.0.1a8
 
   (interactive
-   (completing-read-multiple "Software name: " swver-repo-dir))
+   ;; (list
+   (completing-read-multiple "Software name: " swver-repo-dir)
+   ;; current-prefix-arg)
+   )
 
-  (let* (info
-         (collect (if (> (length name) 1)
-                      (dolist (repo name)
-                        (setq info (concat (swver-repo-info repo)
-                                           (unless (not (equal (list repo) (last name)))
-                                             "\n")
-                                           info))
-                        ;; (push (swver-repo-info repo) info)
-                        )
-                    ;; (push (swver-repo-info (car name) info))
-                    (setq info (swver-repo-info (car name)))
-                    )))
-    ;; (message "swver: `%s' type is %s" info (type-of info))
-    (if current-prefix-arg
-        (progn (kill-new info)
-               (message "swver: Info yanked to the kill ring."))
-      (insert info)))
-  )
+  (message "swver: `%s' type is %s" name (type-of name))
+  (swver--info name)
+  ;; (message "swver: Info %s" swver-info)
 
-(provide 'swver)
+  (message "swver: Current prefix arg value is %s" current-prefix-arg)
+  (message "swver: Is is multiple line? `%s'" swver-multiple-line)
+
+  (cond
+   (
+    ;; (equal arg 4)
+    (eql (car current-prefix-arg) 4)
+    ;; (message "swver: Yank method.")
+    (kill-new swver-info))
+   (
+    ;; (equal arg 16)
+    (eql (car current-prefix-arg) 16)
+    ;; (message "swver: Echo method.")
+    (message "----------------\nswver: \n%s\n----------------" swver-info)
+    (when swver-multiple-line
+      (message "swver: Visit `*Messages*' buffer to see the info.")))
+   (t
+    ;; (message "swver: Insert method.")
+    (insert swver-info))))
+
+  (provide 'swver)
 
 ;;; swver.el ends here
