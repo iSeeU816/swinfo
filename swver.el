@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a9
+;; Version: 0.0.1a10
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a9"
+(defconst swver-version "0.0.1a10"
   "The version of Swver.")
 
 (defvar swver-repo-dir
@@ -77,11 +77,9 @@
 (defun swver--info (name)
   "WIP; 2021-06-10 13:03:34 +0300."
   (message "swver: `%s' type is %s" name (type-of name))
-  (setq swver-multiple-line nil)
   (let* (info
          (collect (if (> (length name) 1)
                       (dolist (repo name)
-                        (setq swver-multiple-line t)
                         (setq info (concat (swver-repo-info repo)
                                            (unless (not (equal (list repo) (last name)))
                                              "\n")
@@ -89,6 +87,18 @@
                     (setq info (swver-repo-info (car name))))))
     (setq swver-info info)
     (message "swver: `%s' type is %s" swver-info (type-of swver-info))))
+
+(defun swver-get-info (arg)
+  "WIP; 2021-06-12 07:47:12 +0300."
+  (cond
+   ((eql arg 4)
+    (kill-new swver-info)
+    (message "swver: Yanked software info into the kill ring."))
+   ((eql arg 16)
+    (let ((single-line
+           (replace-regexp-in-string "\n" " -- " swver-info)))
+      (message "swver: %s" single-line)))
+   (t (insert swver-info))))
 
 (defun swver (&rest name)
   "WIP; 2021-06-04 13:29:10 +0300."
@@ -99,16 +109,8 @@
   (swver--info name)
 
   (message "swver: Current prefix arg value is %s" current-prefix-arg)
-  (message "swver: Is is multiple line? `%s'" swver-multiple-line)
 
-  (cond
-   ((eql (car current-prefix-arg) 4)
-    (kill-new swver-info))
-   ((eql (car current-prefix-arg) 16)
-    (message "----------------\nswver: \n%s\n----------------" swver-info)
-    (when swver-multiple-line
-      (message "swver: Visit `*Messages*' buffer to see the info.")))
-   (t (insert swver-info))))
+  (swver-get-info (car current-prefix-arg)))
 
   (provide 'swver)
 
