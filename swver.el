@@ -116,10 +116,14 @@
         (message "swver: %s" single-line)))
      (t (insert swver-info)))))
 
+(defvar swver--software-name-history nil
+  "WIP; 2021-06-13 17:36:55 +0300.")
+
 (defun swver (&rest name)
   "WIP; 2021-06-04 13:29:10 +0300."
   (interactive
-   (completing-read-multiple "Software name: " swver-software-list))
+   (completing-read-multiple "Software name: " swver-software-list
+                             nil t nil 'swver--software-name-history))
   (message "swver: `%s' and its type is %s" name (type-of name))
   (swver--info name)
   (swver-get-info))
