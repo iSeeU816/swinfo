@@ -22,8 +22,8 @@
 
 ;;; Commentary:
 
-;; Get a software version to insert it in a buffer, or even send it to
-;; the kill ring.
+;; Get a software version to insert it in a buffer, echo it or even send
+;; it to the kill ring.
 
 ;;; Code:
 
@@ -72,38 +72,58 @@
       (format "Emacs config =%s= (%s)" commit-hash commit-date))
      (t (message "swver: %s is something else." repo-name)))))
 
-(defun swver--info (name)
-  "WIP; 2021-06-10 13:03:34 +0300."
-  (let* ((name (reverse name))
-         info
-         (collect (if (> (length name) 1)
-                      (dolist (repo name)
-                        (setq info (concat (swver-repo-info repo)
-                                           (unless (not (equal (list repo) (last name)))
-                                             "\n")
-                                           info)))
-                    (setq info (swver-repo-info (car name))))))
-    (setq swver-info info)))
+(defun swver-package-info (name)
+  "WIP; 2021-06-12 11:14:30 +0300."
+  (let ((elpa-dir package-user-dir))
+    (string-join (directory-files elpa-dir nil name nil 1))))
 
-(defun swver-get-info (arg)
+(defvar swver-software-list '()
+  "WIP; 2021-06-13 11:18:02 +0300.")
+
+(defun swver--combine-list ()
+  "WIP; 2021-06-13 11:18:57 +0300."
+  (setq swver-software-list
+        (append swver-repo-dir package-activated-list)))
+
+(defun swver--info (name)
+  "WIP; 2021-06-12 13:04:17 +0300."
+  (let ((name (reverse name))
+        item
+        info)
+    (while name
+      (setq item (pop name))
+      (cond
+       ((equal item (car (assoc item swver-repo-dir)))
+        (message "swver: `%s' is a repo and its type is %s." item (type-of item))
+        (push (swver-repo-info item) info))
+       ((memq (intern item) package-activated-list)
+        (message "swver: `%s' is a package and its type is %s." item (type-of item))
+        (push (swver-package-info item) info))
+       (t (message "swver: Nothing matches `%s'." item))))
+    (message "swver: `%s'; the type is %s." info (type-of info))
+    (setq swver-info (string-join info "\n"))))
+
+(defun swver-get-info (&optional arg)
   "WIP; 2021-06-12 07:47:12 +0300."
-  (cond
-   ((eql arg 4)
-    (kill-new swver-info)
-    (message "swver: Yanked software info into the kill ring."))
-   ((eql arg 16)
-    (let ((single-line
-           (replace-regexp-in-string "\n" " -- " swver-info)))
-      (message "swver: %s" single-line)))
-   (t (insert swver-info))))
+  (let ((arg (car current-prefix-arg)))
+    (cond
+     ((eq arg 4)
+      (kill-new swver-info)
+      (message "swver: Yanked software info into the kill ring."))
+     ((eq arg 16)
+      (let ((single-line
+             (replace-regexp-in-string "\n" " -- " swver-info)))
+        (message "swver: %s" single-line)))
+     (t (insert swver-info)))))
 
 (defun swver (&rest name)
   "WIP; 2021-06-04 13:29:10 +0300."
   (interactive
-   (completing-read-multiple "Software name: " swver-repo-dir))
+   (completing-read-multiple "Software name: " swver-software-list))
+  (message "swver: `%s' and its type is %s" name (type-of name))
   (swver--info name)
-  (swver-get-info (car current-prefix-arg)))
+  (swver-get-info))
 
-  (provide 'swver)
+(provide 'swver)
 
 ;;; swver.el ends here
