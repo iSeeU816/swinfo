@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a11
+;; Version: 0.0.1a12
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a11"
+(defconst swver-version "0.0.1a12"
   "The version of Swver.")
 
 (defvar swver-repo-dir
@@ -35,18 +35,21 @@
     ("emacs-src" . "~/my_clone/emacs-src"))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
-(defun swver-repo-commit-hash (repo-name)
-  "WIP; 2021-06-05 14:14:05 +0300"
+(defun swver--call-process (command &rest arg)
+  "WIP; 2021-06-14 14:05:41 +0300."
   (with-temp-buffer
-    (let* ((default-directory
-             (cdr (assoc repo-name swver-repo-dir)))
-           (latest-commit-hash
-            (progn (call-process "git" nil '(t nil) nil
-                                 "rev-parse" "HEAD")
-                   (goto-char (point-min))
-                   (buffer-substring (point) (line-end-position))))
-           (latest-commit-hash-short (substring latest-commit-hash 0 10)))
-      (format "%s" latest-commit-hash-short))))
+    (list (apply 'call-process command nil '(t nil) nil arg)
+          (buffer-string))))
+
+(defun swver-repo-commit-hash (repo-name)
+"WIP; 2021-06-05 14:14:05 +0300"
+(with-temp-buffer
+  (let* ((default-directory
+           (cdr (assoc repo-name swver-repo-dir)))
+         (latest-commit-hash
+          (cadr (swver--call-process "git" "rev-parse" "HEAD")))
+         (latest-commit-hash-short (substring latest-commit-hash 0 10)))
+    (format "%s" latest-commit-hash-short))))
 
 (defun swver-repo-commit-date (repo-name)
   "WIP; 2021-06-05 15:04:32 +0300."
@@ -54,11 +57,11 @@
     (let* ((default-directory
              (cdr (assoc repo-name swver-repo-dir)))
            (latest-commit-date
-            (progn
-              (call-process "git" nil '(t nil) nil
-                            "log" "-1" "--date=short" "--format=%cd")
-              (goto-char (point-min))
-              (buffer-substring (point) (line-end-position)))))
+            ;; Using `string-trim' to get rid of the newline at the end
+            ;; of result string.
+            (string-trim
+             (cadr (swver--call-process "git" "log" "-1"
+                                        "--date=short" "--format=%cd")))))
       (format "%s" latest-commit-date))))
 
 (defun swver-repo-info (repo-name)
