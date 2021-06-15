@@ -38,6 +38,9 @@
     ("emacs-src" . "~/my_clone/emacs-src"))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
+(defvar swver-built-in-package '()
+  "WIP; 2021-06-15 15:26:38 +0300.")
+
 (defun swver--call-process (command &rest args)
   "WIP; 2021-06-14 14:05:41 +0300."
   (with-temp-buffer
@@ -125,6 +128,9 @@
        ((equal item (car (assoc item swver-repo-dir)))
         (message "swver: `%s' is a repo and its type is %s." item (type-of item))
         (push (swver-repo-info item) info))
+       ((equal item (car (assoc item swver-built-in-package)))
+        (message "swver: `%s' is a built-in and its type is %s." item (type-of item))
+        (push (funcall (cdr (assoc item swver-built-in-package))) info))
        ((memq (intern item) package-activated-list)
         (message "swver: `%s' is a package and its type is %s." item (type-of item))
         (push (swver-package-info item) info))
