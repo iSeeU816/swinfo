@@ -147,8 +147,10 @@
 (defun swver (&rest name)
   "WIP; 2021-06-04 13:29:10 +0300."
   (interactive
-   (completing-read-multiple "Software name: " swver-software-list
-                             nil nil nil 'swver--software-name-history))
+   (progn
+     (swver--combine-list)
+     (completing-read-multiple "Software name: " swver-software-list
+                               nil nil nil 'swver--software-name-history)))
   (message "swver: `%s' and its type is %s" name (type-of name))
   (swver--info name)
   (swver-get-info))
