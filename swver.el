@@ -35,21 +35,25 @@
     ("emacs-src" . "~/my_clone/emacs-src"))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
-(defun swver--call-process (command &rest arg)
+(defun swver--call-process (command &rest args)
   "WIP; 2021-06-14 14:05:41 +0300."
   (with-temp-buffer
-    (list (apply 'call-process command nil '(t nil) nil arg)
+    (list (apply 'call-process command nil '(t nil) nil args)
           (buffer-string))))
 
+(defun swver--get-first-line (str)
+  "WIP; 2021-06-15 10:42:55 +0300."
+  (replace-regexp-in-string "\n.*" "" str))
+
 (defun swver-repo-commit-hash (repo-name)
-"WIP; 2021-06-05 14:14:05 +0300"
-(with-temp-buffer
-  (let* ((default-directory
-           (cdr (assoc repo-name swver-repo-dir)))
-         (latest-commit-hash
-          (cadr (swver--call-process "git" "rev-parse" "HEAD")))
-         (latest-commit-hash-short (substring latest-commit-hash 0 10)))
-    (format "%s" latest-commit-hash-short))))
+  "WIP; 2021-06-05 14:14:05 +0300"
+  (with-temp-buffer
+    (let* ((default-directory
+             (cdr (assoc repo-name swver-repo-dir)))
+           (latest-commit-hash
+            (cadr (swver--call-process "git" "rev-parse" "HEAD")))
+           (latest-commit-hash-short (substring latest-commit-hash 0 10)))
+      (format "%s" latest-commit-hash-short))))
 
 (defun swver-repo-commit-date (repo-name)
   "WIP; 2021-06-05 15:04:32 +0300."
@@ -80,6 +84,22 @@
   (let ((elpa-dir package-user-dir))
     (string-join (directory-files elpa-dir nil name nil 1))))
 
+(defun swver-unix-tool-info (name)
+  "WIP; 2021-06-14 17:37:54 +0300."
+  (let ((output
+         (cond
+          ((eq 0 (car (swver--call-process name "--version")))
+           (swver--get-first-line
+            (cadr (swver--call-process name "--version"))))
+          ((eq 0 (car (swver--call-process name "-v")))
+           (swver--get-first-line
+            (cadr (swver--call-process name "-v"))))
+          ((eq 0 (car (swver--call-process name "-V")))
+           (swver--get-first-line
+            (cadr (swver--call-process name "-V"))))
+          (t (message "swver: All conditions failed.")))))
+    (format "%s" output)))
+
 (defvar swver-software-list '()
   "WIP; 2021-06-13 11:18:02 +0300.")
 
@@ -102,6 +122,8 @@
        ((memq (intern item) package-activated-list)
         (message "swver: `%s' is a package and its type is %s." item (type-of item))
         (push (swver-package-info item) info))
+       ((eq 0 (shell-command (format "type %s" item)))
+        (push (swver-unix-tool-info item) info))
        (t (message "swver: Nothing matches `%s'." item))))
     (message "swver: `%s'; the type is %s." info (type-of info))
     (setq swver-info (string-join info "\n"))))
@@ -126,7 +148,7 @@
   "WIP; 2021-06-04 13:29:10 +0300."
   (interactive
    (completing-read-multiple "Software name: " swver-software-list
-                             nil t nil 'swver--software-name-history))
+                             nil nil nil 'swver--software-name-history))
   (message "swver: `%s' and its type is %s" name (type-of name))
   (swver--info name)
   (swver-get-info))
