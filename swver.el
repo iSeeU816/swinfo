@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a12
+;; Version: 0.0.1a13
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,11 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a12"
+(defconst swver-version "0.0.1a13"
   "The version of Swver.")
+
+(defvar swver-static '()
+  "WIP; 2021-06-15 13:50:52 +0300.")
 
 (defvar swver-repo-dir
   '(("emacs-config" . "~/.emacs.d")
@@ -106,7 +109,7 @@
 (defun swver--combine-list ()
   "WIP; 2021-06-13 11:18:57 +0300."
   (setq swver-software-list
-        (append swver-repo-dir package-activated-list)))
+        (append swver-static swver-repo-dir package-activated-list)))
 
 (defun swver--info (name)
   "WIP; 2021-06-12 13:04:17 +0300."
@@ -116,6 +119,9 @@
     (while name
       (setq item (pop name))
       (cond
+       ((equal item (car (assoc item swver-static)))
+        (message "swver: `%s' is a static and its type is %s." item (type-of item))
+        (push (cdr (assoc item swver-static)) info))
        ((equal item (car (assoc item swver-repo-dir)))
         (message "swver: `%s' is a repo and its type is %s." item (type-of item))
         (push (swver-repo-info item) info))
