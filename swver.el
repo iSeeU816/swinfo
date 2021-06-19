@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a13
+;; Version: 0.0.1a14
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,15 +27,16 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a13"
+(defconst swver-version "0.0.1a14"
   "The version of Swver.")
 
 (defvar swver-static '()
   "WIP; 2021-06-15 13:50:52 +0300.")
 
 (defvar swver-repo-dir
-  '(("emacs-config" . "~/.emacs.d")
-    ("emacs-src" . "~/my_clone/emacs-src"))
+  '(("emacs-config" . ("~/.emacs.d"))
+    ("emacs-src" . ("~/my_clone/emacs-src"
+                    (funcall (lambda () (format "%s" emacs-version))))))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
 (defvar swver-built-in-package '()
@@ -51,11 +52,14 @@
   "WIP; 2021-06-15 10:42:55 +0300."
   (replace-regexp-in-string "\n.*" "" str))
 
+(defun swver--repo-value-dir (repo-name)
+  "WIP; 2021-06-16 14:54:12 +0300."
+  (cadr (assoc repo-name swver-repo-dir)))
+
 (defun swver-repo-commit-hash (repo-name)
   "WIP; 2021-06-05 14:14:05 +0300"
   (with-temp-buffer
-    (let* ((default-directory
-             (cdr (assoc repo-name swver-repo-dir)))
+    (let* ((default-directory (swver--repo-value-dir repo-name))
            (latest-commit-hash
             (cadr (swver--call-process "git" "rev-parse" "HEAD")))
            (latest-commit-hash-short (substring latest-commit-hash 0 10)))
@@ -64,8 +68,7 @@
 (defun swver-repo-commit-date (repo-name)
   "WIP; 2021-06-05 15:04:32 +0300."
   (with-temp-buffer
-    (let* ((default-directory
-             (cdr (assoc repo-name swver-repo-dir)))
+    (let* ((default-directory (swver--repo-value-dir repo-name))
            (latest-commit-date
             ;; Using `string-trim' to get rid of the newline at the end
             ;; of result string.
@@ -76,14 +79,16 @@
 
 (defun swver-repo-info (repo-name)
   "WIP; 2021-06-05 15:23:07 +0300."
-  (let ((commit-hash (swver-repo-commit-hash repo-name))
-        (commit-date (swver-repo-commit-date repo-name)))
-    (cond
-     ((equal repo-name "emacs-src")
-      (format "Emacs %s =%s= (%s)" emacs-version commit-hash commit-date))
-     ((equal repo-name "emacs-config")
-      (format "Emacs config =%s= (%s)" commit-hash commit-date))
-     (t (message "swver: %s is something else." repo-name)))))
+  (let* ((commit-hash (swver-repo-commit-hash repo-name))
+         (commit-date (swver-repo-commit-date repo-name))
+         (command (car (car (cddr (assoc repo-name swver-repo-dir)))))
+         (args (cdr (car (cddr (assoc repo-name swver-repo-dir)))))
+         (command-result (when command (apply command args))))
+    (if command-result
+        (format "%s: %s; rev %s on %s"
+                repo-name command-result
+                commit-hash commit-date)
+      (format "%s: rev %s on %s" repo-name commit-hash commit-date))))
 
 (defun swver-package-info (name)
   "WIP; 2021-06-12 11:14:30 +0300."
