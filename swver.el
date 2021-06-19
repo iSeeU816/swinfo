@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a14
+;; Version: 0.0.1a15
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,16 +27,17 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a14"
+(defconst swver-version "0.0.1a15"
   "The version of Swver.")
 
 (defvar swver-static '()
   "WIP; 2021-06-15 13:50:52 +0300.")
 
 (defvar swver-repo-dir
-  '(("emacs-config" . ("~/.emacs.d"))
-    ("emacs-src" . ("~/my_clone/emacs-src"
-                    (funcall (lambda () (format "%s" emacs-version))))))
+  '(("emacs-config" . (dir "~/.emacs.d"))
+    ("emacs-src" . ( dir "~/my_clone/emacs-src"
+                     sw-name "Emacs"
+                     command (funcall (lambda () (format "%s" emacs-version))))))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
 (defvar swver-built-in-package '()
@@ -52,14 +53,14 @@
   "WIP; 2021-06-15 10:42:55 +0300."
   (replace-regexp-in-string "\n.*" "" str))
 
-(defun swver--repo-value-dir (repo-name)
-  "WIP; 2021-06-16 14:54:12 +0300."
-  (cadr (assoc repo-name swver-repo-dir)))
+(defun swver--plist-get (alist-list alist-key plist-prop)
+  "WIP; 2021-06-19 15:39:52 +0300."
+  (plist-get (alist-get alist-key alist-list nil nil 'equal) plist-prop))
 
 (defun swver-repo-commit-hash (repo-name)
   "WIP; 2021-06-05 14:14:05 +0300"
   (with-temp-buffer
-    (let* ((default-directory (swver--repo-value-dir repo-name))
+    (let* ((default-directory (swver--plist-get swver-repo-dir repo-name 'dir))
            (latest-commit-hash
             (cadr (swver--call-process "git" "rev-parse" "HEAD")))
            (latest-commit-hash-short (substring latest-commit-hash 0 10)))
@@ -68,7 +69,7 @@
 (defun swver-repo-commit-date (repo-name)
   "WIP; 2021-06-05 15:04:32 +0300."
   (with-temp-buffer
-    (let* ((default-directory (swver--repo-value-dir repo-name))
+    (let* ((default-directory (swver--plist-get swver-repo-dir repo-name 'dir))
            (latest-commit-date
             ;; Using `string-trim' to get rid of the newline at the end
             ;; of result string.
@@ -81,12 +82,12 @@
   "WIP; 2021-06-05 15:23:07 +0300."
   (let* ((commit-hash (swver-repo-commit-hash repo-name))
          (commit-date (swver-repo-commit-date repo-name))
-         (command (car (car (cddr (assoc repo-name swver-repo-dir)))))
-         (args (cdr (car (cddr (assoc repo-name swver-repo-dir)))))
-         (command-result (when command (apply command args))))
+         (sw-name (swver--plist-get swver-repo-dir repo-name 'sw-name))
+         (command (swver--plist-get swver-repo-dir repo-name 'command))
+         (command-result (when command (apply command))))
     (if command-result
-        (format "%s: %s; rev %s on %s"
-                repo-name command-result
+        (format "%s: %s %s; rev %s on %s"
+                repo-name sw-name command-result
                 commit-hash commit-date)
       (format "%s: rev %s on %s" repo-name commit-hash commit-date))))
 
@@ -124,8 +125,10 @@
   (let ((name (reverse name))
         item
         info)
+    (message "swver: `%s' type is %s." name (type-of name))
     (while name
       (setq item (pop name))
+      (message "swver: `%s' type is %s." item (type-of item))
       (cond
        ((equal item (car (assoc item swver-static)))
         (message "swver: `%s' is a static and its type is %s." item (type-of item))
@@ -169,6 +172,7 @@
      (completing-read-multiple "Software name: " swver-software-list
                                nil nil nil 'swver--software-name-history)))
   (message "swver: `%s' and its type is %s" name (type-of name))
+  (message "swver: `%s' and its type is %s" (car name) (type-of (car name)))
   (swver--info name)
   (swver-get-info))
 
