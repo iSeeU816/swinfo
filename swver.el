@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a15
+;; Version: 0.0.1a16
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,17 +27,17 @@
 
 ;;; Code:
 
-(defconst swver-version "0.0.1a15"
+(defconst swver-version "0.0.1a16"
   "The version of Swver.")
 
 (defvar swver-static '()
   "WIP; 2021-06-15 13:50:52 +0300.")
 
 (defvar swver-repo-dir
-  '(("emacs-config" . (dir "~/.emacs.d"))
-    ("emacs-src" . ( dir "~/my_clone/emacs-src"
-                     sw-name "Emacs"
-                     command (funcall (lambda () (format "%s" emacs-version))))))
+  '((emacs-config . (dir "~/.emacs.d"))
+    (emacs-src . ( dir "~/my_clone/emacs-src"
+                   sw-name "Emacs"
+                   command (funcall (lambda () (format "%s" emacs-version))))))
   "WIP; 2021-06-04 09:02:26 +0300.")
 
 (defvar swver-built-in-package '()
@@ -118,7 +118,9 @@
 (defun swver--combine-list ()
   "WIP; 2021-06-13 11:18:57 +0300."
   (setq swver-software-list
-        (append swver-static swver-repo-dir package-activated-list)))
+        (append (mapcar #'car swver-static)
+                (mapcar #'car swver-repo-dir)
+                package-activated-list)))
 
 (defun swver--info (name)
   "WIP; 2021-06-12 13:04:17 +0300."
@@ -169,12 +171,15 @@
   (interactive
    (progn
      (swver--combine-list)
-     (completing-read-multiple "Software name: " swver-software-list
-                               nil nil nil 'swver--software-name-history)))
-  (message "swver: `%s' and its type is %s" name (type-of name))
-  (message "swver: `%s' and its type is %s" (car name) (type-of (car name)))
-  (swver--info name)
-  (swver-get-info))
+     (let ((name (completing-read-multiple "Software name: " swver-software-list
+                                           nil nil nil 'swver--software-name-history)))
+       (and (> (length name) 0) (mapcar #'intern name)))))
+  (if (< (length name) 1)
+      (user-error "swver: No software name specified")
+    (message "swver: `%s' and its type is %s" name (type-of name))
+    (message "swver: `%s' and its type is %s" (car name) (type-of (car name)))
+    (swver--info name)
+    (swver-get-info)))
 
 (provide 'swver)
 
