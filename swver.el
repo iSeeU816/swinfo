@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'package)
+
 (defconst swver-version "0.0.1a16"
   "The version of Swver.")
 
@@ -91,10 +93,24 @@
                 commit-hash commit-date)
       (format "%s: rev %s on %s" repo-name commit-hash commit-date))))
 
-(defun swver-package-info (name)
+(defun swver--package-desc (pkg-name)
+  "WIP; 2021-06-20 18:37:45 +0300."
+  (car (cdr (assq pkg-name package-alist))))
+
+(defun swver--package-desc-extras (pkg-name slot)
+  "WIP; 2021-06-20 18:57:46 +0300."
+  (cdr (assoc slot (package-desc-extras
+                    (car (cdr (assq pkg-name package-alist)))))))
+
+(defun swver-package-info (pkg-name)
   "WIP; 2021-06-12 11:14:30 +0300."
-  (let ((elpa-dir package-user-dir))
-    (string-join (directory-files elpa-dir nil name nil 1))))
+  (when (memq pkg-name (mapcar #'car package-alist))
+    (let* ((name (package-desc-name (swver--package-desc pkg-name)))
+           (full-name (package-desc-full-name (swver--package-desc pkg-name)))
+           (commit-hash (swver--package-desc-extras pkg-name :commit))
+           (commit-hash-short (substring commit-hash 0 10)))
+      (format "%s: %s (rev %s)"
+              pkg-name full-name commit-hash-short))))
 
 (defun swver-unix-tool-info (name)
   "WIP; 2021-06-14 17:37:54 +0300."
@@ -141,7 +157,7 @@
        ((equal item (car (assoc item swver-built-in-package)))
         (message "swver: `%s' is a built-in and its type is %s." item (type-of item))
         (push (funcall (cdr (assoc item swver-built-in-package))) info))
-       ((memq (intern item) package-activated-list)
+       ((memq item package-activated-list)
         (message "swver: `%s' is a package and its type is %s." item (type-of item))
         (push (swver-package-info item) info))
        ((eq 0 (shell-command (format "type %s" item)))
