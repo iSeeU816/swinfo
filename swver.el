@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a16
+;; Version: 0.0.1a17
 ;; Keywords: software version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 
 (require 'package)
 
-(defconst swver-version "0.0.1a16"
+(defconst swver-version "0.0.1a17"
   "The version of Swver.")
 
 (defvar swver-static '()
@@ -58,6 +58,19 @@
 (defun swver--plist-get (alist-list alist-key plist-prop)
   "WIP; 2021-06-19 15:39:52 +0300."
   (plist-get (alist-get alist-key alist-list nil nil 'equal) plist-prop))
+
+(defun swver--plist-get-prop-p (list name prop)
+  "WIP; 2021-06-21 16:34:53 +0300."
+  (if (swver--plist-get list name prop) t nil))
+
+(defun swver-static-info (name)
+  "WIP; 2021-06-21 15:58:49 +0300."
+  (when swver-static
+    (let ((sw-name (swver--plist-get swver-static name 'sw-name))
+          (sw-ver (swver--plist-get swver-static name 'sw-ver)))
+      (format "%s:%s%s" name
+              (if sw-name (concat " " sw-name) "")
+              (if sw-ver (concat " " sw-ver) "")))))
 
 (defun swver-repo-commit-hash (repo-name)
   "WIP; 2021-06-05 14:14:05 +0300"
@@ -150,7 +163,7 @@
       (cond
        ((equal item (car (assoc item swver-static)))
         (message "swver: `%s' is a static and its type is %s." item (type-of item))
-        (push (cdr (assoc item swver-static)) info))
+        (push (swver-static-info item) info))
        ((equal item (car (assoc item swver-repo-dir)))
         (message "swver: `%s' is a repo and its type is %s." item (type-of item))
         (push (swver-repo-info item) info))
