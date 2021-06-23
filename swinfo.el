@@ -4,8 +4,8 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a18
-;; Keywords: software version
+;; Version: 0.0.1a19
+;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,8 +29,10 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a18"
+(defconst swinfo-version "0.0.1a19"
   "The version of Swinfo.")
+
+;;;; Options
 
 (defvar swinfo-static '()
   "WIP; 2021-06-15 13:50:52 +0300.")
@@ -44,6 +46,8 @@
 
 (defvar swinfo-built-in-package '()
   "WIP; 2021-06-15 15:26:38 +0300.")
+
+;;;; Helpers
 
 (defun swinfo--call-process (command &rest args)
   "WIP; 2021-06-14 14:05:41 +0300."
@@ -63,6 +67,10 @@
   "WIP; 2021-06-21 16:34:53 +0300."
   (if (swinfo--plist-get list name prop) t nil))
 
+;;;; Info
+
+;;;;; Static
+
 (defun swinfo-static-info (name)
   "WIP; 2021-06-21 15:58:49 +0300."
   (when swinfo-static
@@ -71,6 +79,8 @@
       (format "%s:%s%s" name
               (if sw-name (concat " " sw-name) "")
               (if sw-ver (concat " " sw-ver) "")))))
+
+;;;;; Repository
 
 (defun swinfo-repo-commit-hash (repo-name)
   "WIP; 2021-06-05 14:14:05 +0300"
@@ -106,6 +116,8 @@
                 commit-hash commit-date)
       (format "%s: rev %s on %s" repo-name commit-hash commit-date))))
 
+;;;;; Package
+
 (defun swinfo--package-desc (pkg-name)
   "WIP; 2021-06-20 18:37:45 +0300."
   (car (cdr (assq pkg-name package-alist))))
@@ -125,6 +137,8 @@
       (format "%s: %s (rev %s)"
               pkg-name full-name commit-hash-short))))
 
+;;;;; Unix tool
+
 (defun swinfo-unix-tool-info (name)
   "WIP; 2021-06-14 17:37:54 +0300."
   (let ((output
@@ -140,6 +154,8 @@
             (cadr (swinfo--call-process name "-V"))))
           (t (message "swinfo: All conditions failed.")))))
     (format "%s" output)))
+
+;;;; Output
 
 (defvar swinfo-software-list '()
   "WIP; 2021-06-13 11:18:02 +0300.")
@@ -209,6 +225,8 @@
     (message "swinfo: `%s' and its type is %s" (car name) (type-of (car name)))
     (swinfo--info name)
     (swinfo-get-info)))
+
+;;;; Closing marks
 
 (provide 'swinfo)
 
