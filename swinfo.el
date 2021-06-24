@@ -122,9 +122,9 @@ belong to ALIST-LIST; otherwise, return `nil'."
   "Return information about static software that goes with the NAME.
 
 Currently, only software name and version are supported."
-  (when swinfo-static
-    (let ((sw-name (swinfo--plist-get swinfo-static name 'sw-name))
-          (sw-ver (swinfo--plist-get swinfo-static name 'sw-ver)))
+  (when swinfo-static-list
+    (let ((sw-name (swinfo--plist-get swinfo-static-list name 'sw-name))
+          (sw-ver (swinfo--plist-get swinfo-static-list name 'sw-ver)))
       (format "%s:%s%s" name
               (if sw-name (concat " " sw-name) "")
               (if sw-ver (concat " " sw-ver) "")))))
@@ -242,7 +242,7 @@ Note that only installed packages (`package-activated-list') are
 gathered and not all packages as what `package-alist' variable is
 for."
   (setq swinfo-software-list
-        (append (mapcar #'car swinfo-static)
+        (append (mapcar #'car swinfo-static-list)
                 (mapcar #'car swinfo-repo-list)
                 package-activated-list)))
 
@@ -257,7 +257,7 @@ about them and set the result to `swinfo-info' variable."
       (setq item (pop name))
       (message "swinfo: `%s' type is %s." item (type-of item))
       (cond
-       ((equal item (car (assoc item swinfo-static)))
+       ((equal item (car (assoc item swinfo-static-list)))
         (message "swinfo: `%s' is a static and its type is %s." item (type-of item))
         (push (swinfo-static-info item) info))
        ((equal item (car (assoc item swinfo-repo-list)))
