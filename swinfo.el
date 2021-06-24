@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a19
+;; Version: 0.0.1a20
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,50 +29,99 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a19"
+(defconst swinfo-version "0.0.1a20"
   "The version of Swinfo.")
 
 ;;;; Options
 
-(defvar swinfo-static '()
-  "WIP; 2021-06-15 13:50:52 +0300.")
+(defvar swinfo-static-list '()
+  "List of software that are mostly in static phase.
 
-(defvar swinfo-repo-dir
-  '((emacs-config . (dir "~/.emacs.d"))
-    (emacs-src . ( dir "~/my_clone/emacs-src"
-                   sw-name "Emacs"
-                   command (funcall (lambda () (format "%s" emacs-version))))))
-  "WIP; 2021-06-04 09:02:26 +0300.")
+An association list (Alist) where CAR is a symbol label for a
+software, and CDR is a property list (Plist) that have (KEY1
+VALUE1 KEY2 VALUE2 ...) style.
+
+Currently, only `sw-name' and `sw-ver' property keys are
+supported. The values of them should be string.
+
+This is mostly for software that met these criteria:
+
+- The software won't be updated anymore or the user choose not to
+  do so.
+
+- It's hard to parse the information or it's not worth it; so
+  simply doing it manually is much faster.
+
+- No automatic way to parse the information.")
+
+(defvar swinfo-repo-list '()
+  "List of software repositories to parse info from them.
+
+An association list (Alist) where CAR is a symbol label for a
+repository, and CAR is a property list (Plist) that have (KEY1
+VALUE1 KEY2 VALUE2 ...) style.
+
+Currently, only `dir', `sw-name' and `command' property keys are
+supported.
+
+`dir': A string of a repository absolute path.
+
+`sw-name' (optional): A string of software name.
+
+`command' (optional): Call a command with `funcall' function
+which must return a string. It's useful to parse information that
+can't be parsed from the repository.
+
+Note that this can be used for repositories that are not related
+to any software. It's a way of getting latest commit hash and
+date for them.")
 
 (defvar swinfo-built-in-package '()
-  "WIP; 2021-06-15 15:26:38 +0300.")
+  "List of built-in packages.")
 
 ;;;; Helpers
 
 (defun swinfo--call-process (command &rest args)
-  "WIP; 2021-06-14 14:05:41 +0300."
+  "Return output (as string) of shell COMMAND that can be called
+with optional arguments ARGS. Consult `call-process' for more
+info."
   (with-temp-buffer
     (list (apply 'call-process command nil '(t nil) nil args)
           (buffer-string))))
 
 (defun swinfo--get-first-line (str)
-  "WIP; 2021-06-15 10:42:55 +0300."
+  "Return first line of multiple lines string STR.
+
+This is useful to only get the first line of a shell command
+output."
   (replace-regexp-in-string "\n.*" "" str))
 
 (defun swinfo--plist-get (alist-list alist-key plist-prop)
-  "WIP; 2021-06-19 15:39:52 +0300."
+  "Get value of PLIST-PROP key that is nested under ALIST-KEY for ALIST-LIST.
+
+Suppose you have something like this:
+
+  (setq swinfo-repo-list
+        '((repo-name . (dir \"/tmp/foo/repo-name\" sw-name \"Foo\"))))
+
+And you want to get \"Foo\", so you call:
+
+  (swinfo--plist-get swinfo-repo-list 'repo-name 'sw-name)"
   (plist-get (alist-get alist-key alist-list nil nil 'equal) plist-prop))
 
-(defun swinfo--plist-get-prop-p (list name prop)
-  "WIP; 2021-06-21 16:34:53 +0300."
-  (if (swinfo--plist-get list name prop) t nil))
+(defun swinfo--plist-get-prop-p (alist-list alist-key plist-prop)
+  "Return `t' if PLIST-PROP key is exist under ALIST-KEY that
+belong to ALIST-LIST; otherwise, return `nil'."
+  (if (swinfo--plist-get alist-list alist-key plist-prop) t nil))
 
 ;;;; Info
 
 ;;;;; Static
 
 (defun swinfo-static-info (name)
-  "WIP; 2021-06-21 15:58:49 +0300."
+  "Return information about static software that goes with the NAME.
+
+Currently, only software name and version are supported."
   (when swinfo-static
     (let ((sw-name (swinfo--plist-get swinfo-static name 'sw-name))
           (sw-ver (swinfo--plist-get swinfo-static name 'sw-ver)))
@@ -83,32 +132,44 @@
 ;;;;; Repository
 
 (defun swinfo-repo-commit-hash (repo-name)
-  "WIP; 2021-06-05 14:14:05 +0300"
+  "Return repository REPO-NAME commit hash (10 digits)."
   (with-temp-buffer
-    (let* ((default-directory (swinfo--plist-get swinfo-repo-dir repo-name 'dir))
+    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name 'dir))
            (latest-commit-hash
             (cadr (swinfo--call-process "git" "rev-parse" "HEAD")))
            (latest-commit-hash-short (substring latest-commit-hash 0 10)))
       (format "%s" latest-commit-hash-short))))
 
 (defun swinfo-repo-commit-date (repo-name)
-  "WIP; 2021-06-05 15:04:32 +0300."
+  "Return repository REPO-NAME commit date (ISO format)."
   (with-temp-buffer
-    (let* ((default-directory (swinfo--plist-get swinfo-repo-dir repo-name 'dir))
+    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name 'dir))
            (latest-commit-date
             ;; Using `string-trim' to get rid of the newline at the end
             ;; of result string.
             (string-trim
              (cadr (swinfo--call-process "git" "log" "-1"
-                                        "--date=short" "--format=%cd")))))
+                                         "--date=short" "--format=%cd")))))
       (format "%s" latest-commit-date))))
 
 (defun swinfo-repo-info (repo-name)
-  "WIP; 2021-06-05 15:23:07 +0300."
+  "Return information about repository REPO-NAME.
+
+Supported information so far:
+
+- Repository name (as the user label it in `swinfo-repo-list'
+  variable).
+
+- Software name (if any provided).
+
+- A command output, something like software version that related
+  to the repository (if any).
+
+- Latest commit hash and date."
   (let* ((commit-hash (swinfo-repo-commit-hash repo-name))
          (commit-date (swinfo-repo-commit-date repo-name))
-         (sw-name (swinfo--plist-get swinfo-repo-dir repo-name 'sw-name))
-         (command (swinfo--plist-get swinfo-repo-dir repo-name 'command))
+         (sw-name (swinfo--plist-get swinfo-repo-list repo-name 'sw-name))
+         (command (swinfo--plist-get swinfo-repo-list repo-name 'command))
          (command-result (when command (apply command))))
     (if command-result
         (format "%s: %s %s; rev %s on %s"
@@ -119,16 +180,27 @@
 ;;;;; Package
 
 (defun swinfo--package-desc (pkg-name)
-  "WIP; 2021-06-20 18:37:45 +0300."
+  "Return package name as symbol for PKG-NAME from `package-alist'
+variable."
   (car (cdr (assq pkg-name package-alist))))
 
 (defun swinfo--package-desc-extras (pkg-name slot)
-  "WIP; 2021-06-20 18:57:46 +0300."
+  "Return value of SLOT for PKG-NAME from `package-alist' variable
+with the help of `package-desc-extras' function."
   (cdr (assoc slot (package-desc-extras
                     (car (cdr (assq pkg-name package-alist)))))))
 
 (defun swinfo-package-info (pkg-name)
-  "WIP; 2021-06-12 11:14:30 +0300."
+  "Return information about package PKG-NAME.
+
+Supported information so far:
+
+- Package name to be used as label.
+
+- Full name that is package name and its version as latest's
+  commit date. Something like `foo-20210624.18.59'.
+
+- Latest commit hash (10 digits)."
   (when (memq pkg-name (mapcar #'car package-alist))
     (let* ((name (package-desc-name (swinfo--package-desc pkg-name)))
            (full-name (package-desc-full-name (swinfo--package-desc pkg-name)))
@@ -140,7 +212,10 @@
 ;;;;; Unix tool
 
 (defun swinfo-unix-tool-info (name)
-  "WIP; 2021-06-14 17:37:54 +0300."
+  "Return Unix tool NAME information.
+
+Currently, it's only return what Unix tool version command
+returns."
   (let ((output
          (cond
           ((eq 0 (car (swinfo--call-process name "--version")))
@@ -158,17 +233,22 @@
 ;;;; Output
 
 (defvar swinfo-software-list '()
-  "WIP; 2021-06-13 11:18:02 +0300.")
+  "A list to gather software names in as symbols.")
 
 (defun swinfo--combine-list ()
-  "WIP; 2021-06-13 11:18:57 +0300."
+  "Combine lists to have one list of software names as symbols.
+
+Note that only installed packages (`package-activated-list') are
+gathered and not all packages as what `package-alist' variable is
+for."
   (setq swinfo-software-list
         (append (mapcar #'car swinfo-static)
-                (mapcar #'car swinfo-repo-dir)
+                (mapcar #'car swinfo-repo-list)
                 package-activated-list)))
 
 (defun swinfo--info (name)
-  "WIP; 2021-06-12 13:04:17 +0300."
+  "Loop through NAME (list of software names) to gather information
+about them and set the result to `swinfo-info' variable."
   (let ((name (reverse name))
         item
         info)
@@ -180,7 +260,7 @@
        ((equal item (car (assoc item swinfo-static)))
         (message "swinfo: `%s' is a static and its type is %s." item (type-of item))
         (push (swinfo-static-info item) info))
-       ((equal item (car (assoc item swinfo-repo-dir)))
+       ((equal item (car (assoc item swinfo-repo-list)))
         (message "swinfo: `%s' is a repo and its type is %s." item (type-of item))
         (push (swinfo-repo-info item) info))
        ((equal item (car (assoc item swinfo-built-in-package)))
@@ -195,8 +275,12 @@
     (message "swinfo: `%s'; the type is %s." info (type-of info))
     (setq swinfo-info (string-join info "\n"))))
 
-(defun swinfo-get-info (&optional arg)
-  "WIP; 2021-06-12 07:47:12 +0300."
+(defun swinfo--get-info (&optional arg)
+  "Get software information in different methods.
+
+If called with one \\[universal-argument], send info to
+`kill-ring', but if called with two \\[universal-argument] then
+echo info to echo area. Otherwise, insert info in active buffer."
   (let ((arg (car current-prefix-arg)))
     (cond
      ((eq arg 4)
@@ -209,10 +293,21 @@
      (t (insert swinfo-info)))))
 
 (defvar swinfo--software-name-history nil
-  "WIP; 2021-06-13 17:36:55 +0300.")
+  "Variable to hold Swinfo history when type/select software names
+in minibuffer.")
 
 (defun swinfo (&rest name)
-  "WIP; 2021-06-04 13:29:10 +0300."
+  "Get software information for NAME.
+
+When called interactively, you can choose multiple candidates by
+separate them with `crm-separator' character. For Unix tool, you
+can type them as is, as `swinfo--info' function will check them
+if no match was found in other categories' list.
+
+In Lisp form, you can type Unix tool name as string, for other
+categories' list, it must be a symbol.
+
+See `swinfo--get-info' as how information is returned."
   (interactive
    (progn
      (swinfo--combine-list)
@@ -224,7 +319,7 @@
     (message "swinfo: `%s' and its type is %s" name (type-of name))
     (message "swinfo: `%s' and its type is %s" (car name) (type-of (car name)))
     (swinfo--info name)
-    (swinfo-get-info)))
+    (swinfo--get-info)))
 
 ;;;; Closing marks
 
