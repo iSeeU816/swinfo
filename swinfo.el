@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a20
+;; Version: 0.0.1a21
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a20"
+(defconst swinfo-version "0.0.1a21"
   "The version of Swinfo.")
 
 ;;;; Options
@@ -182,13 +182,15 @@ Supported information so far:
 (defun swinfo--package-desc (pkg-name)
   "Return package name as symbol for PKG-NAME from `package-alist'
 variable."
-  (car (cdr (assq pkg-name package-alist))))
+  ;; Using `package--alist' function is to make sure that
+  ;; `pacakge-alist' variable value is not `nil'.
+  (car (cdr (assq pkg-name (package--alist)))))
 
 (defun swinfo--package-desc-extras (pkg-name slot)
   "Return value of SLOT for PKG-NAME from `package-alist' variable
 with the help of `package-desc-extras' function."
   (cdr (assoc slot (package-desc-extras
-                    (car (cdr (assq pkg-name package-alist)))))))
+                    (car (cdr (assq pkg-name (package--alist))))))))
 
 (defun swinfo-package-info (pkg-name)
   "Return information about package PKG-NAME.
@@ -201,12 +203,12 @@ Supported information so far:
   commit date. Something like `foo-20210624.18.59'.
 
 - Latest commit hash (10 digits)."
-  (when (memq pkg-name (mapcar #'car package-alist))
+  (when (memq pkg-name (mapcar #'car (package--alist)))
     (let* ((name (package-desc-name (swinfo--package-desc pkg-name)))
            (full-name (package-desc-full-name (swinfo--package-desc pkg-name)))
            (commit-hash (swinfo--package-desc-extras pkg-name :commit))
            (commit-hash-short (substring commit-hash 0 10)))
-      (format "%s: %s (rev %s)"
+      (format "%s: %s; rev %s"
               pkg-name full-name commit-hash-short))))
 
 ;;;;; Unix tool
@@ -228,7 +230,7 @@ returns."
            (swinfo--get-first-line
             (cadr (swinfo--call-process name "-V"))))
           (t (message "swinfo: All conditions failed.")))))
-    (format "%s" output)))
+    (format "%s: %s" name output)))
 
 ;;;; Output
 
@@ -318,6 +320,7 @@ See `swinfo--get-info' as how information is returned."
       (user-error "swinfo: No software name specified")
     (message "swinfo: `%s' and its type is %s" name (type-of name))
     (message "swinfo: `%s' and its type is %s" (car name) (type-of (car name)))
+    (swinfo--combine-list)
     (swinfo--info name)
     (swinfo--get-info)))
 
