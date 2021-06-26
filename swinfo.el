@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a21
+;; Version: 0.0.1a22
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,20 @@
 
 ;;; Commentary:
 
-;; Get a software information to insert it in a buffer, echo it or even
-;; send it to the kill ring.
+;; Swinfo (software information) is an Emacs package that returns
+;; information for software in different methods, like sending the info to
+;; the clipboard, echo or insert it in the active buffer. This package can
+;; be helpful in situation where you want to report an issue but the
+;; information for the tool in question is needed to help fix or narrow it
+;; down.
+
+;; See this package's readme.org file for more info.
 
 ;;; Code:
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a21"
+(defconst swinfo-version "0.0.1a22"
   "The version of Swinfo.")
 
 ;;;; Options
@@ -203,7 +209,7 @@ Supported information so far:
          (command-result (when command (apply command))))
     (format "%s: %s %s" pkg-name sw-name command-result)))
 
-;;;;; Package
+;;;;; External package
 
 (defun swinfo--package-desc (pkg-name)
   "Return package name as symbol for PKG-NAME from `package-alist'

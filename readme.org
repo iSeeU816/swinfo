@@ -1,0 +1,90 @@
+#+title: Swinfo readme
+#+author: iseeu
+#+date: 2021-06-27 00:08:16 +0300
+
+* Intro
+
+Swinfo (software information) is an Emacs package that returns
+information for software in different methods, like sending the info to
+the clipboard, echo or insert it in the active buffer. This package can
+be helpful in situation where you want to report an issue but the
+information for the tool in question is needed to help fix or narrow it
+down.
+
+There are five categories to get information from:
+
+1. Static:
+
+   This is for software that the chance they get updated are low or the
+   user choose not to do so. Sometimes it better to feed the information
+   manually than go with the hard or maybe impossible road to get the
+   information from a specific software.
+
+2. Repository:
+
+   When you are using a software by compiling it from its source Git
+   repository, it's easy to know which latest commit hash and date for a
+   single repository; but what if you are having many repositories you
+   want to check their information at once, it will take time to do so.
+   This package can help you in this regards; you only need to add minor
+   information about these repositories to get the information you are
+   after.
+
+3. Built-in package:
+
+   You can provide a list of built-in packages and shape how their
+   information is presented. Currently, the support for this category is
+   shallow.
+
+4. External package:
+
+   This is for external packages installed by =package.el= library which
+   are exist in "elpa" directory.
+
+5. Unix tool:
+
+   Unix tools are a lot and they have different options to output their
+   version info. So, this package is doing a smart check and return the
+   info as to let you not thinking much about the method but how to
+   present the info.
+
+* Installation (WIP)
+
+This package is currently not available in Melpa or any other package
+archives. It's too young to put it in popular archives as things might
+change frequently.
+
+To use this package you need to clone it and then require it in your
+Emacs init file.
+
+1. Clone the package repository to a location that =load-path= variable
+   is looking into:
+
+* Usage (WIP)
+
+For minimal usage of this package, you can require its library with
+=(require 'swinfo)= and only call =M-x swinfo= to choose from installed
+external packages or even type a Unix tool name to insert their
+information.
+
+Here we go with a detailed instructions with some examples on how to use
+this package:
+
+** Static
+
+1. First you set value for =swinfo-static-list= variable and evaluate
+   it. You can add this to your Emacs init file:
+
+   #+begin_src emacs-lisp
+(setq swinfo-static-list
+      '((foo . (sw-name "Foo" sw-ver "0.8.16"))
+        (bar . (sw-name "Bar" sw-ver "0.0.1"))))
+   #+end_src
+
+2. Call =M-x swinfo= and type =foo= or select it from the list. You
+   should have something like this:
+   - =foo: Foo 0.8.16=.
+3. You can use the Lisp form =(swinfo 'foo)= and evaluate it to get the
+   same result as above. To evaluate it, just put the point after the
+   closing parenthesis and hit =C-x C-e= or call =M-x =eval-last-sexp=
+   command.
