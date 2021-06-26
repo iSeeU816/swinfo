@@ -121,11 +121,6 @@ And you want to get \"Foo\", so you call:
   (swinfo--plist-get swinfo-repo-list 'repo-name 'sw-name)"
   (plist-get (alist-get alist-key alist-list nil nil 'equal) plist-prop))
 
-(defun swinfo--plist-get-prop-p (alist-list alist-key plist-prop)
-  "Return `t' if PLIST-PROP key is exist under ALIST-KEY that
-belong to ALIST-LIST; otherwise, return `nil'."
-  (if (swinfo--plist-get alist-list alist-key plist-prop) t nil))
-
 ;;;; Info
 
 ;;;;; Static
