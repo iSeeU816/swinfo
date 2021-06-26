@@ -76,8 +76,20 @@ Note that this can be used for repositories that are not related
 to any software. It's a way of getting latest commit hash and
 date for them.")
 
-(defvar swinfo-built-in-package '()
-  "List of built-in packages.")
+(defvar swinfo-built-in-package-list '()
+  "List of built-in packages.
+
+An association list (Alist) where CAR is a symbol label for a
+repository, and CAR is a property list (Plist) that have (KEY1
+VALUE1 KEY2 VALUE2 ...) style.
+
+Currently, only `sw-name' and `command' property keys are
+supported.
+
+`sw-name': A string of software name.
+
+`command': Call a command with `funcall' function which must
+return a string.")
 
 ;;;; Helpers
 
@@ -177,6 +189,25 @@ Supported information so far:
                 commit-hash commit-date)
       (format "%s: rev %s on %s" repo-name commit-hash commit-date))))
 
+;;;;; Built-in package
+
+(defun swinfo-built-in-package-info (pkg-name)
+  "WIP; 2021-06-25 20:41:44 +0300.
+
+Return information about built-in package PKG-NAME.
+
+Supported information so far:
+
+- Software name.
+
+- A command output, something like software version."
+  (let* ((sw-name (swinfo--plist-get
+                   swinfo-built-in-package-list pkg-name 'sw-name))
+         (command (swinfo--plist-get
+                   swinfo-built-in-package-list pkg-name 'command))
+         (command-result (when command (apply command))))
+    (format "%s: %s %s" pkg-name sw-name command-result)))
+
 ;;;;; Package
 
 (defun swinfo--package-desc (pkg-name)
@@ -265,9 +296,9 @@ about them and set the result to `swinfo-info' variable."
        ((equal item (car (assoc item swinfo-repo-list)))
         (message "swinfo: `%s' is a repo and its type is %s." item (type-of item))
         (push (swinfo-repo-info item) info))
-       ((equal item (car (assoc item swinfo-built-in-package)))
+       ((equal item (car (assoc item swinfo-built-in-package-list)))
         (message "swinfo: `%s' is a built-in and its type is %s." item (type-of item))
-        (push (funcall (cdr (assoc item swinfo-built-in-package))) info))
+        (push (swinfo-built-in-package-info item) info))
        ((memq item package-activated-list)
         (message "swinfo: `%s' is a package and its type is %s." item (type-of item))
         (push (swinfo-package-info item) info))
