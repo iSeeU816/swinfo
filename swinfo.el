@@ -226,7 +226,7 @@ Supported information so far:
 - Package name to be used as label.
 
 - Full name that is package name and its version as latest's
-  commit date. Something like `foo-20210624.18.59'.
+  commit date. Something like `foo-20210624.1859'.
 
 - Latest commit hash (10 digits)."
   (when (memq pkg-name (mapcar #'car (package--alist)))
@@ -242,8 +242,8 @@ Supported information so far:
 (defun swinfo-unix-tool-info (name)
   "Return Unix tool NAME information.
 
-Currently, it's only return what Unix tool version command
-returns."
+Currently, it only returns the first line of what Unix tool
+version command output is."
   (let ((output
          (cond
           ((eq 0 (car (swinfo--call-process name "--version")))
@@ -254,8 +254,7 @@ returns."
             (cadr (swinfo--call-process name "-v"))))
           ((eq 0 (car (swinfo--call-process name "-V")))
            (swinfo--get-first-line
-            (cadr (swinfo--call-process name "-V"))))
-          (t (message "swinfo: All conditions failed.")))))
+            (cadr (swinfo--call-process name "-V")))))))
     (format "%s: %s" name output)))
 
 ;;;; Output
@@ -280,27 +279,20 @@ about them and set the result to `swinfo-info' variable."
   (let ((name (reverse name))
         item
         info)
-    (message "swinfo: `%s' type is %s." name (type-of name))
     (while name
       (setq item (pop name))
-      (message "swinfo: `%s' type is %s." item (type-of item))
       (cond
        ((equal item (car (assoc item swinfo-static-list)))
-        (message "swinfo: `%s' is a static and its type is %s." item (type-of item))
         (push (swinfo-static-info item) info))
        ((equal item (car (assoc item swinfo-repo-list)))
-        (message "swinfo: `%s' is a repo and its type is %s." item (type-of item))
         (push (swinfo-repo-info item) info))
        ((equal item (car (assoc item swinfo-built-in-package-list)))
-        (message "swinfo: `%s' is a built-in and its type is %s." item (type-of item))
         (push (swinfo-built-in-package-info item) info))
        ((memq item package-activated-list)
-        (message "swinfo: `%s' is a package and its type is %s." item (type-of item))
         (push (swinfo-package-info item) info))
        ((eq 0 (shell-command (format "type %s" item)))
         (push (swinfo-unix-tool-info item) info))
        (t (message "swinfo: Nothing matches `%s'." item))))
-    (message "swinfo: `%s'; the type is %s." info (type-of info))
     (setq swinfo-info (string-join info "\n"))))
 
 (defun swinfo--get-info (&optional arg)
@@ -332,7 +324,7 @@ separate them with `crm-separator' character. For Unix tool, you
 can type them as is, as `swinfo--info' function will check them
 if no match was found in other categories' list.
 
-In Lisp form, you can type Unix tool name as string, for other
+In Lisp form, you must type Unix tool name as string, for other
 categories' list, it must be a symbol.
 
 See `swinfo--get-info' as how information is returned."
@@ -344,8 +336,6 @@ See `swinfo--get-info' as how information is returned."
        (and (> (length name) 0) (mapcar #'intern name)))))
   (if (< (length name) 1)
       (user-error "swinfo: No software name specified")
-    (message "swinfo: `%s' and its type is %s" name (type-of name))
-    (message "swinfo: `%s' and its type is %s" (car name) (type-of (car name)))
     (swinfo--combine-list)
     (swinfo--info name)
     (swinfo--get-info)))
