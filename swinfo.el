@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a22
+;; Version: 0.0.1a23
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a22"
+(defconst swinfo-version "0.0.1a23"
   "The version of Swinfo.")
 
 ;;;; Options
@@ -47,7 +47,7 @@ An association list (Alist) where CAR is a symbol label for a
 software, and CDR is a property list (Plist) that have (KEY1
 VALUE1 KEY2 VALUE2 ...) style.
 
-Currently, only `sw-name' and `sw-ver' property keys are
+Currently, only `:sw-name' and `:sw-ver' property keys are
 supported. The values of them should be string.
 
 This is mostly for software that met these criteria:
@@ -67,14 +67,14 @@ An association list (Alist) where CAR is a symbol label for a
 repository, and CAR is a property list (Plist) that have (KEY1
 VALUE1 KEY2 VALUE2 ...) style.
 
-Currently, only `dir', `sw-name' and `command' property keys are
+Currently, only `:dir', `:sw-name' and `:command' property keys are
 supported.
 
-`dir': A string of a repository absolute path.
+`:dir': A string of a repository absolute path.
 
-`sw-name' (optional): A string of software name.
+`:sw-name' (optional): A string of software name.
 
-`command' (optional): Call a command with `funcall' function
+`:command' (optional): Call a command with `funcall' function
 which must return a string. It's useful to parse information that
 can't be parsed from the repository.
 
@@ -89,12 +89,12 @@ An association list (Alist) where CAR is a symbol label for a
 repository, and CAR is a property list (Plist) that have (KEY1
 VALUE1 KEY2 VALUE2 ...) style.
 
-Currently, only `sw-name' and `command' property keys are
+Currently, only `:sw-name' and `:command' property keys are
 supported.
 
-`sw-name': A string of software name.
+`:sw-name': A string of software name.
 
-`command': Call a command with `funcall' function which must
+`:command': Call a command with `funcall' function which must
 return a string.")
 
 ;;;; Helpers
@@ -120,11 +120,11 @@ output."
 Suppose you have something like this:
 
   (setq swinfo-repo-list
-        '((repo-name . (dir \"/tmp/foo/repo-name\" sw-name \"Foo\"))))
+        '((repo-name . (:dir \"/tmp/foo/repo-name\" :sw-name \"Foo\"))))
 
 And you want to get \"Foo\", so you call:
 
-  (swinfo--plist-get swinfo-repo-list 'repo-name 'sw-name)"
+  (swinfo--plist-get swinfo-repo-list 'repo-name :sw-name)"
   (plist-get (alist-get alist-key alist-list nil nil 'equal) plist-prop))
 
 ;;;; Info
@@ -136,8 +136,8 @@ And you want to get \"Foo\", so you call:
 
 Currently, only software name and version are supported."
   (when swinfo-static-list
-    (let ((sw-name (swinfo--plist-get swinfo-static-list name 'sw-name))
-          (sw-ver (swinfo--plist-get swinfo-static-list name 'sw-ver)))
+    (let ((sw-name (swinfo--plist-get swinfo-static-list name :sw-name))
+          (sw-ver (swinfo--plist-get swinfo-static-list name :sw-ver)))
       (format "%s:%s%s" name
               (if sw-name (concat " " sw-name) "")
               (if sw-ver (concat " " sw-ver) "")))))
@@ -147,7 +147,7 @@ Currently, only software name and version are supported."
 (defun swinfo-repo-commit-hash (repo-name)
   "Return repository REPO-NAME commit hash (10 digits)."
   (with-temp-buffer
-    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name 'dir))
+    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name :dir))
            (latest-commit-hash
             (cadr (swinfo--call-process "git" "rev-parse" "HEAD")))
            (latest-commit-hash-short (substring latest-commit-hash 0 10)))
@@ -156,7 +156,7 @@ Currently, only software name and version are supported."
 (defun swinfo-repo-commit-date (repo-name)
   "Return repository REPO-NAME commit date (ISO format)."
   (with-temp-buffer
-    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name 'dir))
+    (let* ((default-directory (swinfo--plist-get swinfo-repo-list repo-name :dir))
            (latest-commit-date
             ;; Using `string-trim' to get rid of the newline at the end
             ;; of result string.
@@ -181,8 +181,8 @@ Supported information so far:
 - Latest commit hash and date."
   (let* ((commit-hash (swinfo-repo-commit-hash repo-name))
          (commit-date (swinfo-repo-commit-date repo-name))
-         (sw-name (swinfo--plist-get swinfo-repo-list repo-name 'sw-name))
-         (command (swinfo--plist-get swinfo-repo-list repo-name 'command))
+         (sw-name (swinfo--plist-get swinfo-repo-list repo-name :sw-name))
+         (command (swinfo--plist-get swinfo-repo-list repo-name :command))
          (command-result (when command (apply command))))
     (if command-result
         (format "%s: %s %s; rev %s on %s"
@@ -203,9 +203,9 @@ Supported information so far:
 
 - A command output, something like software version."
   (let* ((sw-name (swinfo--plist-get
-                   swinfo-built-in-package-list pkg-name 'sw-name))
+                   swinfo-built-in-package-list pkg-name :sw-name))
          (command (swinfo--plist-get
-                   swinfo-built-in-package-list pkg-name 'command))
+                   swinfo-built-in-package-list pkg-name :command))
          (command-result (when command (apply command))))
     (format "%s: %s %s" pkg-name sw-name command-result)))
 

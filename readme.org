@@ -77,8 +77,8 @@ this package:
 
    #+begin_src emacs-lisp
 (setq swinfo-static-list
-      '((foo . (sw-name "Foo" sw-ver "0.8.16"))
-        (bar . (sw-name "Bar" sw-ver "0.0.1"))))
+      '((foo . (:sw-name "Foo" :sw-ver "0.8.16"))
+        (bar . (:sw-name "Bar" :sw-ver "0.0.1"))))
    #+end_src
 
 2. Call =M-x swinfo= and type =foo= or select it from the list. You
