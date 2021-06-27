@@ -17,7 +17,7 @@ There are five categories to get information from:
 
    This is for software that the chance they get updated are low or the
    user choose not to do so. Sometimes it better to feed the information
-   manually than go with the hard or maybe impossible road to get the
+   manually than go with the hard or maybe tricky road to get the
    information from a specific software.
 
 2. Repository:
@@ -88,3 +88,102 @@ this package:
    same result as above. To evaluate it, just put the point after the
    closing parenthesis and hit =C-x C-e= or call =M-x =eval-last-sexp=
    command.
+
+** Repository
+
+This shares the same structure as static category, except this has an
+extra property key named =:dir=. That property key is essential to know
+where the repository is located so Swinfo knows what =default-directory=
+should be used when calling shell command related to Git.
+
+1. Set =swinfo-repo-list= variable like this and evaluate it as
+   mentioned in static section above:
+
+   #+begin_src emacs-lisp
+(setq swinfo-repo-list
+      '((emacs-config . (:dir "~/.emacs.d"))
+        (emacs-src . ( :dir "~/my_clone/emacs-src"
+                       :sw-name "Emacs"
+                       :command (funcall (lambda () (format "%s" emacs-version)))))))
+   #+end_src
+
+2. When calling =M-x swinfo= and then typing =emacs-config,emacs-src=
+   and then hitting =RET=, the output should be like this:
+
+   #+begin_src text
+emacs-config: rev eddcda0520 on 2021-06-14
+emacs-src: Emacs 28.0.50; rev cee502ea18 on 2021-05-29
+   #+end_src
+
+*Notes:*
+
+- Notice how only =:dir= property key is defined in =emacs-config= cons
+  list; which means no extra info should be printed. This type of style
+  work well for repositories that are not related to a software.
+- Not like the other example, where commit hash and date info are not
+  enough; so the need to print the software name and version sometimes
+  necessary and add such context about the repository in question.
+
+** Built-in package
+
+A simple category to shape the way that some built-in packages return
+their versions.
+
+1. Set =swinfo-built-in-package-list= variable to something like this
+   and evaluate it:
+
+   #+begin_src emacs-lisp
+(setq swinfo-built-in-package-list
+      '((org . (:sw-name "Org" :command (funcall org-version)))))
+   #+end_src
+
+2. Call =M-x swinfo= and type =org= to get info like this:
+   - =org: Org 9.4.4=.
+
+** External packages
+
+This category currently only concern about packages installed by
+=package.el= library which they installed in =elpa= directory.
+
+No needed setup for this category, just call =M-x swinfo= and type a
+package name to get its info. For example =magit= which the output
+should look like this:
+
+#+begin_src text
+magit: magit-20210531.1524; rev 4a8646a30d
+#+end_src
+
+Or you can use a Lisp form =(swinfo 'magit)= to get the same result.
+
+** Unix tool
+
+This is a powerful category to have. It simply returns the first line of
+the output that Unix tool version command sends out.
+
+Call =M-x swinfo= and then type a Unix tool to get its version info. For
+example =git= should returns =git: git version 2.32.0=.
+
+When using Lisp form, you must double quote the Unix tool name, so the
+above example should look like this =(swinfo "git")= and the output is
+the same.
+
+*IMPORTANT NOTE:* The name of Unix tool that you provide must match the
+ full name. No fuzzy search is applied here, so =(swinfo "gi")= signals
+ an error if you meant to get Git version and there is no =gi= tool is
+ installed. To check of what you should type, run this command in a
+ shell ~$ type git~ which should NOT signal an error but output the path
+ for the tool; of course, change =git= here with the Unix tool in mind.
+
+** Mix
+
+You can mix categories together in one command to get the information
+you're after. For example =(swinfo 'emacs-src "git" 'magit)= should
+output this:
+
+#+begin_src text
+emacs-src: Emacs 28.0.50; rev cee502ea18 on 2021-05-29
+git: git version 2.32.0
+magit: magit-20210531.1524; rev 4a8646a30d
+#+end_src
+
+The order of the output is the same order in the command.
