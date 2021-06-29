@@ -263,6 +263,17 @@ version command output is."
             (cadr (swinfo--call-process name "-V")))))))
     (format "%s: %s" name output)))
 
+;;;; Misc
+
+(defun swinfo-version (&optional full)
+  "Echo Swinfo version information.
+
+When FULL argument is non-nil print Swinfo with the version."
+  (when swinfo-version
+    (if full
+        (format "Swinfo %s" swinfo-version)
+      swinfo-version)))
+
 ;;;; Output
 
 (defvar swinfo-software-list '()
