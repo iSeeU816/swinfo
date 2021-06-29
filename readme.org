@@ -48,7 +48,7 @@ There are five categories to get information from:
    info as to let you not thinking much about the method but how to
    present the info.
 
-* Installation (WIP)
+* Installation
 
 This package is currently not available in Melpa or any other package
 archives. It's too young to put it in popular archives as things might
@@ -59,6 +59,43 @@ Emacs init file.
 
 1. Clone the package repository to a location that =load-path= variable
    is looking into:
+
+   #+begin_src shell
+git clone https://github.com/iSeeU816/swinfo
+   #+end_src
+
+2. There are two ways to setup this package:
+   1. Emacs vanilla way:
+
+      #+begin_src emacs-lisp
+(require 'swinfo)
+(with-eval-after-load 'swinfo
+  (setq swinfo-static-list
+        '((foo . (:sw-name "Foo" :sw-ver "0.8.16"))
+          (bar . (:sw-name "Bar" :sw-ver "0.0.1"))))
+  ;; Add other list customization here.
+
+  (let ((map global-map))
+    (define-key map (kbd "C-c i i") #'swinfo-insert-info)
+    (define-key map (kbd "C-c i e") #'swinfo-echo-info)
+    (define-key map (kbd "C-c i y") #'swinfo-yank-info)))
+      #+end_src
+
+   2. [[https://github.com/jwiegley/use-package][use-package]] way:
+
+      #+begin_src emacs-lisp
+(use-package swinfo
+  :config
+  (setq swinfo-static-list
+        '((foo . (:sw-name "Foo" :sw-ver "0.8.16"))
+          (bar . (:sw-name "Bar" :sw-ver "0.0.1"))))
+  :bind (("C-c i i" . swinfo-insert-info)
+         ("C-c i e" . swinfo-echo-info)
+         ("C-c i y" . swinfo-yank-info)))
+      #+end_src
+
+Note that these are examples setup, you should use real world data.
+Refer to usage section below to know more about how to use this package.
 
 * Usage (WIP)
 
