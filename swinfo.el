@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a23
+;; Version: 0.0.1a24
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a23"
+(defconst swinfo-version "0.0.1a24"
   "The version of Swinfo.")
 
 ;;;; Options
@@ -301,50 +301,81 @@ about them and set the result to `swinfo-info' variable."
        (t (message "swinfo: Nothing matches `%s'." item))))
     (setq swinfo-info (string-join info "\n"))))
 
-(defun swinfo--get-info (&optional arg)
+(defun swinfo--get-info (get-method)
   "Get software information in different methods.
 
-If called with one \\[universal-argument], send info to
-`kill-ring', but if called with two \\[universal-argument] then
-echo info to echo area. Otherwise, insert info in active buffer."
-  (let ((arg (car current-prefix-arg)))
-    (cond
-     ((eq arg 4)
-      (kill-new swinfo-info)
-      (message "swinfo: Yanked software info into the kill ring."))
-     ((eq arg 16)
-      (let ((single-line
-             (replace-regexp-in-string "\n" " -- " swinfo-info)))
-        (message "swinfo: %s" single-line)))
-     (t (insert swinfo-info)))))
+If called with one \\[universal-argument] or GET-METHOD argument
+value is `yank' (symbol) then send info to `kill-ring', but if
+called with two \\[universal-argument] or GET-METHOD argument
+value is `echo' (symbol) then echo info to echo area. Otherwise,
+insert info in active buffer. The latter case is when GET-METHOD
+argument value is `nil', `t' or `insert' (symbol).
+
+This function is meant to be used in `swinfo' function."
+  (cond
+   ((or (equal current-prefix-arg '(4))
+        (eq get-method 'yank))
+    (kill-new swinfo-info)
+    (message "swinfo: Yanked software info into the kill ring."))
+   ((or (equal current-prefix-arg '(16))
+        (eq get-method 'echo))
+    (let ((single-line
+           (replace-regexp-in-string "\n" " -- " swinfo-info)))
+      (message "swinfo: %s" single-line)))
+   (t (insert swinfo-info))))
 
 (defvar swinfo--software-name-history nil
   "Variable to hold Swinfo history when type/select software names
 in minibuffer.")
 
-(defun swinfo (&rest name)
+(defun swinfo-yank-info ()
+  "Send software info to `kill-ring'."
+  (interactive)
+  (let ((current-prefix-arg '(4)))
+    (call-interactively #'swinfo)))
+
+(defun swinfo-echo-info ()
+  "Echo software info to echo area."
+  (interactive)
+  (let ((current-prefix-arg '(16)))
+    (call-interactively #'swinfo)))
+
+(defun swinfo-insert-info ()
+  "Insert software info in the active buffer."
+  (interactive)
+  (let ((current-prefix-arg nil))
+    (call-interactively #'swinfo)))
+
+(defun swinfo (name &optional get-method)
   "Get software information for NAME.
+
+NAME argument is a list. This can contain symbols and strings.
+The string part is for Unix tool category.
+
+The optional GET-METHOD argument can be a symbol that represent
+the output method, which are `yank', `echo' and `insert' symbols.
+For interactive usage, \\[universal-argument] is the one that
+represents which method should be used, see `swinfo--get-info'
+function for more info about this. If this argument omitted then
+`insert' method what will be used.
 
 When called interactively, you can choose multiple candidates by
 separate them with `crm-separator' character. For Unix tool, you
 can type them as is, as `swinfo--info' function will check them
-if no match was found in other categories' list.
-
-In Lisp form, you must type Unix tool name as string, for other
-categories' list, it must be a symbol.
-
-See `swinfo--get-info' as how information is returned."
+if no match was found in other categories' list."
   (interactive
-   (progn
-     (swinfo--combine-list)
-     (let ((name (completing-read-multiple "Software name: " swinfo-software-list
-                                           nil nil nil 'swinfo--software-name-history)))
-       (and (> (length name) 0) (mapcar #'intern name)))))
+   (list
+    (progn
+      (swinfo--combine-list)
+      (let ((name (completing-read-multiple "Software name: " swinfo-software-list
+                                            nil nil nil 'swinfo--software-name-history)))
+        (and (> (length name) 0) (mapcar #'intern name))))
+    current-prefix-arg))
   (if (< (length name) 1)
       (user-error "swinfo: No software name specified")
     (swinfo--combine-list)
     (swinfo--info name)
-    (swinfo--get-info)))
+    (swinfo--get-info get-method)))
 
 ;;;; Closing marks
 

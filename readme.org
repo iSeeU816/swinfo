@@ -84,10 +84,10 @@ this package:
 2. Call =M-x swinfo= and type =foo= or select it from the list. You
    should have something like this:
    - =foo: Foo 0.8.16=.
-3. You can use the Lisp form =(swinfo 'foo)= and evaluate it to get the
-   same result as above. To evaluate it, just put the point after the
-   closing parenthesis and hit =C-x C-e= or call =M-x =eval-last-sexp=
-   command.
+3. You can use the Lisp form =(swinfo '(foo))= and evaluate it to get
+   the same result as above. To evaluate it, just put the point after
+   the closing parenthesis and hit =C-x C-e= or call =M-x
+   =eval-last-sexp= command.
 
 ** Repository
 
@@ -153,7 +153,7 @@ should look like this:
 magit: magit-20210531.1524; rev 4a8646a30d
 #+end_src
 
-Or you can use a Lisp form =(swinfo 'magit)= to get the same result.
+Or you can use a Lisp form =(swinfo '(magit))= to get the same result.
 
 ** Unix tool
 
@@ -164,20 +164,21 @@ Call =M-x swinfo= and then type a Unix tool to get its version info. For
 example =git= should returns =git: git version 2.32.0=.
 
 When using Lisp form, you must double quote the Unix tool name, so the
-above example should look like this =(swinfo "git")= and the output is
-the same.
+above example should look like this =(swinfo '("git"))= and the output
+is the same.
 
 *IMPORTANT NOTE:* The name of Unix tool that you provide must match the
- full name. No fuzzy search is applied here, so =(swinfo "gi")= signals
- an error if you meant to get Git version and there is no =gi= tool is
- installed. To check of what you should type, run this command in a
- shell ~$ type git~ which should NOT signal an error but output the path
- for the tool; of course, change =git= here with the Unix tool in mind.
+ full name. No fuzzy search is applied here, so =(swinfo '("gi"))=
+ signals an error if you meant to get Git version and there is no =gi=
+ tool is installed. To check of what you should type, run this command
+ in a shell ~$ type git~ which should NOT signal an error but output the
+ path for the tool; of course, change =git= here with the Unix tool in
+ mind.
 
 ** Mix
 
 You can mix categories together in one command to get the information
-you're after. For example =(swinfo 'emacs-src "git" 'magit)= should
+you're after. For example =(swinfo '(emacs-src "git" magit))= should
 output this:
 
 #+begin_src text
