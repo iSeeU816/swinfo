@@ -23,11 +23,11 @@
 ;;; Commentary:
 
 ;; Swinfo (software information) is an Emacs package that returns
-;; information for software in different methods, like sending the info to
-;; the clipboard, echo or insert it in the active buffer. This package can
-;; be helpful in situation where you want to report an issue but the
-;; information for the tool in question is needed to help fix or narrow it
-;; down.
+;; information for software in different methods, like sending the info
+;; to the clipboard, echo or insert it in the current buffer. This
+;; package can be helpful in situation where you want to report an issue
+;; but the information for the tool in question is needed to help fix or
+;; narrow it down.
 
 ;; See this package's readme.org file for more info.
 
@@ -308,7 +308,7 @@ If called with one \\[universal-argument] or GET-METHOD argument
 value is `yank' (symbol) then send info to `kill-ring', but if
 called with two \\[universal-argument] or GET-METHOD argument
 value is `echo' (symbol) then echo info to echo area. Otherwise,
-insert info in active buffer. The latter case is when GET-METHOD
+insert info in current buffer. The latter case is when GET-METHOD
 argument value is `nil', `t' or `insert' (symbol).
 
 This function is meant to be used in `swinfo' function."
@@ -341,7 +341,7 @@ in minibuffer.")
     (call-interactively #'swinfo)))
 
 (defun swinfo-insert-info ()
-  "Insert software info in the active buffer."
+  "Insert software info in the current buffer."
   (interactive)
   (let ((current-prefix-arg nil))
     (call-interactively #'swinfo)))

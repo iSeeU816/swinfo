@@ -6,7 +6,7 @@
 
 Swinfo (software information) is an Emacs package that returns
 information for software in different methods, like sending the info to
-the clipboard, echo or insert it in the active buffer. This package can
+the clipboard, echo or insert it in the current buffer. This package can
 be helpful in situation where you want to report an issue but the
 information for the tool in question is needed to help fix or narrow it
 down.
@@ -97,7 +97,7 @@ git clone https://github.com/iSeeU816/swinfo
 Note that these are examples setup, you should use real world data.
 Refer to usage section below to know more about how to use this package.
 
-* Usage (WIP)
+* Usage
 
 For minimal usage of this package, you can require its library with
 =(require 'swinfo)= and only call =M-x swinfo= to choose from installed
@@ -121,9 +121,9 @@ this package:
 2. Call =M-x swinfo= and type =foo= or select it from the list. You
    should have something like this:
    - =foo: Foo 0.8.16=.
-3. You can use the Lisp form =(swinfo '(foo))= and evaluate it to get
-   the same result as above. To evaluate it, just put the point after
-   the closing parenthesis and hit =C-x C-e= or call =M-x
+3. You can use the Emacs Lisp form =(swinfo '(foo))= and evaluate it to
+   get the same result as above. To evaluate it, just put the point
+   after the closing parenthesis and hit =C-x C-e= or call =M-x
    =eval-last-sexp= command.
 
 ** Repository
@@ -190,7 +190,8 @@ should look like this:
 magit: magit-20210531.1524; rev 4a8646a30d
 #+end_src
 
-Or you can use a Lisp form =(swinfo '(magit))= to get the same result.
+Or you can use an Emacs Lisp form =(swinfo '(magit))= to get the same
+result.
 
 ** Unix tool
 
@@ -200,9 +201,9 @@ the output that Unix tool version command sends out.
 Call =M-x swinfo= and then type a Unix tool to get its version info. For
 example =git= should returns =git: git version 2.32.0=.
 
-When using Lisp form, you must double quote the Unix tool name, so the
-above example should look like this =(swinfo '("git"))= and the output
-is the same.
+When using Emacs Lisp form, you must double quote the Unix tool name, so
+the above example should look like this =(swinfo '("git"))= and the
+output is the same.
 
 *IMPORTANT NOTE:* The name of Unix tool that you provide must match the
  full name. No fuzzy search is applied here, so =(swinfo '("gi"))=
@@ -225,3 +226,49 @@ magit: magit-20210531.1524; rev 4a8646a30d
 #+end_src
 
 The order of the output is the same order in the command.
+
+** Output methods
+
+Swinfo provides three methods to get the information.
+
+*** Yank (send info to the clipboard)
+
+You can send the info to the clipboard by doing any of the following
+items:
+
++ Hit =C-u= (control-u) and then call Swinfo command by either =M-x
+  swinfo= or invoke the key binding that you might assigned it to
+  =swinfo= command.
+
++ In Emacs Lisp form: =(swinfo '(magit) 'yank)=. Notice the =yank=
+  symbol.
+
+*** Echo (echo info to echo area)
+
+You might wants to check a version info for a package, this is what
+echo feature is for.
+
++ Hit =C-u C-u= (control-u twice) and then call Swinfo command by either
+  =M-x swinfo= or invoke the key binding that you might assigned it to
+  =swinfo= command.
+
++ Same as yank method, you just need to use =echo= symbol instead.
+  =(swinfo '(magit) 'echo)=.
+
+*** Insert (insert info in the current buffer)
+
+You're in middle of reporting something and wants to mention what
+version of software you're using as it might adds context to the issue
+in mind; here where this method shines.
+
++ With this method, you just call =M-x swinfo= or invoke the key binding
+  to =swinfo= command.
+
++ You can use four different forms of Emacs Lisp with this method:
+
+  1. =(swinfo '(magit) 'insert)=: Use =insert= symbol for the optional
+     argument.
+  2. =(swinfo '(magit) t)=.
+  3. =(swinfo '(magit) nil)=.
+  4. =(swinfo '(magit))=: You can omit the optional argument all
+     together.
