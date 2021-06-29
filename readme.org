@@ -76,6 +76,7 @@ git clone https://github.com/iSeeU816/swinfo
   ;; Add other list customization here.
 
   (let ((map global-map))
+    (define-key map (kbd "C-c i s") #'swinfo)
     (define-key map (kbd "C-c i i") #'swinfo-insert-info)
     (define-key map (kbd "C-c i e") #'swinfo-echo-info)
     (define-key map (kbd "C-c i y") #'swinfo-yank-info)))
@@ -89,7 +90,8 @@ git clone https://github.com/iSeeU816/swinfo
   (setq swinfo-static-list
         '((foo . (:sw-name "Foo" :sw-ver "0.8.16"))
           (bar . (:sw-name "Bar" :sw-ver "0.0.1"))))
-  :bind (("C-c i i" . swinfo-insert-info)
+  :bind (("C-c i s" . swinfo)
+         ("C-c i i" . swinfo-insert-info)
          ("C-c i e" . swinfo-echo-info)
          ("C-c i y" . swinfo-yank-info)))
       #+end_src
@@ -272,3 +274,10 @@ in mind; here where this method shines.
   3. =(swinfo '(magit) nil)=.
   4. =(swinfo '(magit))=: You can omit the optional argument all
      together.
+
+* Contribute
+
+Please report a bug if you encounter one or request a feature if it's in
+this project scope.
+
+Of course, you can contribute to the code if you want to. Thanks!
