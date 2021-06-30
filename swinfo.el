@@ -4,7 +4,7 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a24
+;; Version: 0.0.1a25
 ;; Keywords: software info information version
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a24"
+(defconst swinfo-version "0.0.1a25"
   "The version of Swinfo.")
 
 ;;;; Options
