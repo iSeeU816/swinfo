@@ -4,8 +4,9 @@
 
 ;; Author: iSeeU
 ;; Created: 2021-06-03 07:12:19 +0300
-;; Version: 0.0.1a25
+;; Version: 0.0.1
 ;; Keywords: software info information version
+;; Homepage: https://github.com/iSeeU816/swinfo
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,7 +36,7 @@
 
 (require 'package)
 
-(defconst swinfo-version "0.0.1a25"
+(defconst swinfo-version "0.0.1"
   "The version of Swinfo.")
 
 ;;;; Options
