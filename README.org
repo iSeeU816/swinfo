@@ -1,4 +1,4 @@
-#+title: Swinfo readme
+#+title: Swinfo - Get software information
 #+author: iseeu
 #+date: 2021-06-27 00:08:16 +0300
 
@@ -127,7 +127,7 @@ this package:
 3. You can use the Emacs Lisp form =(swinfo '(foo))= and evaluate it to
    get the same result as above. To evaluate it, just put the point
    after the closing parenthesis and hit =C-x C-e= or call =M-x
-   =eval-last-sexp= command.
+   eval-last-sexp= command.
 
 ** Repository
 
@@ -163,6 +163,11 @@ emacs-src: Emacs 28.0.50; rev cee502ea18 on 2021-05-29
 - Not like the other example, where commit hash and date info are not
   enough; so the need to print the software name and version sometimes
   necessary and add such context about the repository in question.
+- The comma character between software names in step 2 above is the
+  default value of =crm-separator= variable. This is valid when dealing
+  with a command that support multiple inputs, you know this if the
+  command uses =completing-read-multiple= function instead of
+  =completing-read= function.
 
 ** Built-in package
 
@@ -219,8 +224,9 @@ output is the same.
 ** Mix
 
 You can mix categories together in one command to get the information
-you're after. For example =(swinfo '(emacs-src "git" magit))= should
-output this:
+you're after.
+
+For example =(swinfo '(emacs-src "git" magit))= should output this:
 
 #+begin_src text
 emacs-src: Emacs 28.0.50; rev cee502ea18 on 2021-05-29
