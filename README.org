@@ -2,7 +2,7 @@
 #+author: iseeu
 #+date: 2021-06-27 00:08:16 +0300
 
-* Intro
+* Introduction
 
 Swinfo (software information) is an Emacs package that returns
 information for software in different methods, like sending the info to
@@ -86,6 +86,7 @@ git clone https://github.com/iSeeU816/swinfo
 
       #+begin_src emacs-lisp
 (use-package swinfo
+  :load-path "/path/where/you/cloned/the/repository/swinfo"
   :config
   (setq swinfo-static-list
         '((foo . (:sw-name "Foo" :sw-ver "0.8.16"))
@@ -281,3 +282,7 @@ Please report a bug if you encounter one or request a feature if it's in
 this project scope.
 
 Of course, you can contribute to the code if you want to. Thanks!
+
+* License
+
+GNU General Public License, version 3.0.

@@ -29,7 +29,7 @@
 ;; but the information for the tool in question is needed to help fix or
 ;; narrow it down.
 
-;; See this package's readme.org file for more info.
+;; See this package's README.org file for more info.
 
 ;;; Code:
 
@@ -193,9 +193,7 @@ Supported information so far:
 ;;;;; Built-in package
 
 (defun swinfo-built-in-package-info (pkg-name)
-  "WIP; 2021-06-25 20:41:44 +0300.
-
-Return information about built-in package PKG-NAME.
+  "Return information about built-in package PKG-NAME.
 
 Supported information so far:
 
