@@ -39,7 +39,7 @@ There are five categories to get information from:
 4. External package:
 
    This is for external packages installed by =package.el= library which
-   are exist in "elpa" directory.
+   are exist in =elpa= directory.
 
 5. Unix tool:
 
@@ -68,6 +68,8 @@ git clone https://github.com/iSeeU816/swinfo
    1. Emacs vanilla way:
 
       #+begin_src emacs-lisp
+(add-to-list 'load-path
+             "/path/where/you/cloned/the/repository/swinfo")
 (require 'swinfo)
 (with-eval-after-load 'swinfo
   (setq swinfo-static-list
@@ -209,7 +211,7 @@ the output that Unix tool version command sends out.
 Call =M-x swinfo= and then type a Unix tool to get its version info. For
 example =git= should returns =git: git version 2.32.0=.
 
-When using Emacs Lisp form, you must double quote the Unix tool name, so
+When using Emacs Lisp form, you can double quote the Unix tool name, so
 the above example should look like this =(swinfo '("git"))= and the
 output is the same.
 

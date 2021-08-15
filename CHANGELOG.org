@@ -4,6 +4,10 @@
 
 * Change log
 
-* Version 0.0.1 (2021-07-01)
+** Unreleased
+
+- Fix an error when trying to get a Unix tool info.
+
+** Version 0.0.1 (2021-07-01)
 
 - Initial public version.

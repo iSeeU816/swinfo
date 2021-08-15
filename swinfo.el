@@ -249,17 +249,20 @@ Supported information so far:
 
 Currently, it only returns the first line of what Unix tool
 version command output is."
-  (let ((output
-         (cond
-          ((eq 0 (car (swinfo--call-process name "--version")))
-           (swinfo--get-first-line
-            (cadr (swinfo--call-process name "--version"))))
-          ((eq 0 (car (swinfo--call-process name "-v")))
-           (swinfo--get-first-line
-            (cadr (swinfo--call-process name "-v"))))
-          ((eq 0 (car (swinfo--call-process name "-V")))
-           (swinfo--get-first-line
-            (cadr (swinfo--call-process name "-V")))))))
+  (let* ((name (if (symbolp name)
+                   (symbol-name name)
+                 name))
+         (output
+          (cond
+           ((eq 0 (car (swinfo--call-process name "--version")))
+            (swinfo--get-first-line
+             (cadr (swinfo--call-process name "--version"))))
+           ((eq 0 (car (swinfo--call-process name "-v")))
+            (swinfo--get-first-line
+             (cadr (swinfo--call-process name "-v"))))
+           ((eq 0 (car (swinfo--call-process name "-V")))
+            (swinfo--get-first-line
+             (cadr (swinfo--call-process name "-V")))))))
     (format "%s: %s" name output)))
 
 ;;;; Misc
@@ -307,6 +310,9 @@ about them and set the result to `swinfo-info' variable."
        ((memq item package-activated-list)
         (push (swinfo-package-info item) info))
        ((eq 0 (shell-command (format "type %s" item)))
+        ;; To hide the message in echo area that resulted from
+        ;; `shell-command' function above.
+        (message "")
         (push (swinfo-unix-tool-info item) info))
        (t (message "swinfo: Nothing matches `%s'." item))))
     (setq swinfo-info (string-join info "\n"))))
