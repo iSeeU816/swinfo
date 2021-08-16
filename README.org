@@ -81,7 +81,7 @@ git clone https://github.com/iSeeU816/swinfo
     (define-key map (kbd "C-c i s") #'swinfo)
     (define-key map (kbd "C-c i i") #'swinfo-insert-info)
     (define-key map (kbd "C-c i e") #'swinfo-echo-info)
-    (define-key map (kbd "C-c i y") #'swinfo-yank-info)))
+    (define-key map (kbd "C-c i k") #'swinfo-kill-info)))
       #+end_src
 
    2. [[https://github.com/jwiegley/use-package][use-package]] way:
@@ -96,7 +96,7 @@ git clone https://github.com/iSeeU816/swinfo
   :bind (("C-c i s" . swinfo)
          ("C-c i i" . swinfo-insert-info)
          ("C-c i e" . swinfo-echo-info)
-         ("C-c i y" . swinfo-yank-info)))
+         ("C-c i k" . swinfo-kill-info)))
       #+end_src
 
 Note that these are examples setup, you should use real world data.
@@ -242,7 +242,7 @@ The order of the output is the same order in the command.
 
 Swinfo provides three methods to get the information.
 
-*** Yank (send info to the clipboard)
+*** Kill (send info to the clipboard)
 
 You can send the info to the clipboard by doing any of the following
 items:
@@ -251,7 +251,7 @@ items:
   swinfo= or invoke the key binding that you might assigned it to
   =swinfo= command.
 
-+ In Emacs Lisp form: =(swinfo '(magit) 'yank)=. Notice the =yank=
++ In Emacs Lisp form: =(swinfo '(magit) 'kill)=. Notice the =kill=
   symbol.
 
 *** Echo (echo info to echo area)
@@ -263,7 +263,7 @@ echo feature is for.
   =M-x swinfo= or invoke the key binding that you might assigned it to
   =swinfo= command.
 
-+ Same as yank method, you just need to use =echo= symbol instead.
++ Same as Kill method, you just need to use =echo= symbol instead.
   =(swinfo '(magit) 'echo)=.
 
 *** Insert (insert info in the current buffer)

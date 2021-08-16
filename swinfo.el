@@ -321,7 +321,7 @@ about them and set the result to `swinfo-info' variable."
   "Get software information in different methods.
 
 If called with one \\[universal-argument] or GET-METHOD argument
-value is `yank' (symbol) then send info to `kill-ring', but if
+value is `kill' (symbol) then send info to `kill-ring', but if
 called with two \\[universal-argument] or GET-METHOD argument
 value is `echo' (symbol) then echo info to echo area. Otherwise,
 insert info in current buffer. The latter case is when GET-METHOD
@@ -330,9 +330,9 @@ argument value is `nil', `t' or `insert' (symbol).
 This function is meant to be used in `swinfo' function."
   (cond
    ((or (equal current-prefix-arg '(4))
-        (eq get-method 'yank))
+        (eq get-method 'kill))
     (kill-new swinfo-info)
-    (message "swinfo: Yanked software info into the kill ring."))
+    (message "swinfo: Killed (copied) software info into the kill ring."))
    ((or (equal current-prefix-arg '(16))
         (eq get-method 'echo))
     (let ((single-line
@@ -344,7 +344,7 @@ This function is meant to be used in `swinfo' function."
   "Variable to hold Swinfo history when type/select software names
 in minibuffer.")
 
-(defun swinfo-yank-info ()
+(defun swinfo-kill-info ()
   "Send software info to `kill-ring'."
   (interactive)
   (let ((current-prefix-arg '(4)))
@@ -369,7 +369,7 @@ NAME argument is a list. This can contain symbols and strings.
 The string part is for Unix tool category.
 
 The optional GET-METHOD argument can be a symbol that represent
-the output method, which are `yank', `echo' and `insert' symbols.
+the output method, which are `kill', `echo' and `insert' symbols.
 For interactive usage, \\[universal-argument] is the one that
 represents which method should be used, see `swinfo--get-info'
 function for more info about this. If this argument omitted then
